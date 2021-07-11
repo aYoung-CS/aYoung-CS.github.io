@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>how2heap之House_of_Roman | aYoung's Blog</title><meta name="keywords" content="ctf,pwn,how2heap"><meta name="author" content="aYoung"><meta name="copyright" content="aYoung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="House of Roman总结一句话就是fastbin attack+unsorted bin attack+brute force该方法不需要泄露libc地址，partial overwrite写onegadget或者system撞大运（1&#x2F;4096） step 1Fastbin Chunk points to __malloc_hook 这里的fastbin attack利用了堆块的布局，结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="how2heap之House_of_Roman">
+<meta property="og:url" content="https://iamayoung.xyz/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/index.html">
+<meta property="og:site_name" content="aYoung&#39;s Blog">
+<meta property="og:description" content="House of Roman总结一句话就是fastbin attack+unsorted bin attack+brute force该方法不需要泄露libc地址，partial overwrite写onegadget或者system撞大运（1&#x2F;4096） step 1Fastbin Chunk points to __malloc_hook 这里的fastbin attack利用了堆块的布局，结">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg">
+<meta property="article:published_time" content="2021-07-10T04:33:41.000Z">
+<meta property="article:modified_time" content="2021-07-11T15:33:44.309Z">
+<meta property="article:author" content="aYoung">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="how2heap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg"><link rel="shortcut icon" href="/"><link rel="canonical" href="https://iamayoung.xyz/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-07-11 23:33:44'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">48</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">aYoung's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">how2heap之House_of_Roman</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-07-10T04:33:41.000Z" title="发表于 2021-07-10 12:33:41">2021-07-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-07-11T15:33:44.309Z" title="更新于 2021-07-11 23:33:44">2021-07-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ctf/">ctf</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">548</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="House-of-Roman"><a href="#House-of-Roman" class="headerlink" title="House of Roman"></a>House of Roman</h1><p>总结一句话就是fastbin attack+unsorted bin attack+brute force<br>该方法不需要泄露libc地址，partial overwrite写onegadget或者system撞大运（1/4096）</p>
+<h1 id="step-1"><a href="#step-1" class="headerlink" title="step 1"></a>step 1</h1><p><strong>Fastbin Chunk points to __malloc_hook</strong></p>
+<p><strong>这里的fastbin attack利用了堆块的布局，结合off_by_one构造fastbin链，值得关注</strong></p>
+<p>1<br>fastbin_victim 0x71<br>chunk 0x91<br>main_arena_use 0x91<br>relative_offset_heap 0x71<br>Top chunk</p>
+<p>2<br>free(main_arena_use)<br>unsortedbin main_arena_use 0x91</p>
+<p>3<br>malloc(0x60)</p>
+<p>fastbin_victim 0x71<br>chunk 0x91<br>fake_libc_chunk 0x71<br>unsorted bin 0x21<br>relative_offset_heap 0x71<br>Top chunk</p>
+<p>4<br>free(relative_offset_heap)<br>free(fastbin_victim)</p>
+<p>fastbin: fastbin_victim-&gt;relative_offset_heap</p>
+<p>5<br><strong>Previous</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Free</span> chunk (fastbins) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603000</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">71</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">603190</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Allocated</span> chunk | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603070</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">91</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Allocated</span> chunk | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603100</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">71</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Free</span> chunk (unsortedbin) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603170</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">21</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">78</span></span><br><span class="line"><span class="attribute">bk</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">78</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Free</span> chunk (fastbins)</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603190</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">70</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">00</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Top</span> chunk | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603200</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">20</span>e<span class="number">01</span></span><br></pre></td></tr></table></figure>
+
+<p>fastbin_victim的fd指针最后一字节改为<code>\x00</code></p>
+<p><strong>After</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Free</span> chunk (fastbins) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603000</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">71</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">603100</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Allocated</span> chunk | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603070</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">91</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Free</span> chunk (fastbins) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603100</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">71</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdbf<span class="number">8</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Free</span> chunk (unsortedbin) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603170</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">21</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">78</span></span><br><span class="line"><span class="attribute">bk</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">78</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Allocated</span> chunk</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603190</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">70</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Top</span> chunk | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603200</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">20</span>e<span class="number">01</span></span><br></pre></td></tr></table></figure>
+<p>fastbin: fastbin_victim-&gt;fake_libc_chunk-&gt;main_arena+88</p>
+<p>6<br>修改fake_libc_chunk的fd指针后两字节为&amp;__malloc_hook-0x23后两字节<br>fastbin: fastbin_victim -&gt; fake_libc_chunk -&gt; (__malloc_hook - 0x23)   size:0x70<br>（开了地址随机化时该步骤成功率为1/16）</p>
+<p>7<br>malloc(0x60)<br>malloc(0x60)<br>malloc_hook_chunk = malloc(0x60)</p>
+<h1 id="step-2"><a href="#step-2" class="headerlink" title="step 2"></a>step 2</h1><p>**Unsorted_bin attack **<br>1<br>unsorted bin ptr = malloc(0x80)<br>malloc(0x30) [barrier]</p>
+<p>2<br>free(unsorted bin ptr) -&gt;unsorted bin</p>
+<p>3<br><strong>Previous</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Free</span> chunk (unsortedbin) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603200</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">91</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">78</span></span><br><span class="line"><span class="attribute">bk</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">78</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Allocated</span> chunk</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603290</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">40</span></span><br></pre></td></tr></table></figure>
+<p>修改unsorted bin的bk指针最后两字节为__malloc_hook最后两字节<br><strong>After</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Free</span> chunk (unsortedbin) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603200</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">91</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">78</span></span><br><span class="line"><span class="attribute">bk</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>bcdb<span class="number">00</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">Allocated</span> chunk</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">603290</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>x<span class="number">40</span></span><br></pre></td></tr></table></figure>
+<p>这一步存在爆破，正确与否与之前fastbin attack中相同，成功率不变</p>
+<p>4<br>trigger the unsortedbin attack<br>malloc(0x80)</p>
+<p>则会向地址<code>0x7ffff7bcdb00+0x10</code>处写入<code>0x7ffff7bcdb78</code>，即向<code>__malloc_hook</code>写入<code>main_arena+88</code></p>
+<h1 id="step-3"><a href="#step-3" class="headerlink" title="step 3"></a>step 3</h1><p><strong>set __malloc_hook to  system/one_gadget</strong><br>此时<code>__malloc_hook</code>已经写入了<code>main_arena+88</code><br>接下来利用step 1中fastbin attack申请到的chunk对__malloc_hook进行partial overwrite，共写入三个字节，其中低12bits是确定的，而高12bits需要爆破，成功率为1/4096=0.02%<br>同时如果这里能爆破成功，则上一步必然也成功，所以这一步的成功率为整个攻击的成功率</p>
+<p>举例来说<br>当前__malloc_hook写入的是0x00007ffff7bcdb78（但我们实际上不知道）<br>自行假设libc基址后三字节为0x809000<br>计算得one_gadget后三字节为0x84e226<br>并且好像__malloc_hook的倒数第三个数字与libc基址倒数第三个数字固定相差0x4，所以也就可以算出fastbin attack中需要爆破的数字应该为0xd</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>fastbin attack申请到<code>__malloc_hook-0x23</code>处的堆块</li>
+<li>unsorted bin attack将main_arena+88写入__malloc_hook</li>
+<li>编辑堆块，partial overwrite写入onegadget或system地址</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">aYoung</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://iamayoung.xyz/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/">https://iamayoung.xyz/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://iamayoung.xyz" target="_blank">aYoung's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ctf/">ctf</a><a class="post-meta__tags" href="/tags/pwn/">pwn</a><a class="post-meta__tags" href="/tags/how2heap/">how2heap</a></div><div class="post_share"><div class="social-share" data-image="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2021/07/06/%E3%80%90WP%E3%80%91%E5%A8%B1%E4%B9%90%E8%B5%9Bawd%E7%9A%84%E4%B8%80%E9%81%93pwn%E9%A2%98/"><img class="next-cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【WP】娱乐赛awd的一道pwn题</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/05/12/how2heap学习笔记-3/" title="how2heap学习笔记-3"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-12</div><div class="title">how2heap学习笔记-3</div></div></a></div><div><a href="/2021/03/31/how2heap学习笔记-1/" title="how2heap学习笔记-1"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-03-31</div><div class="title">how2heap学习笔记-1</div></div></a></div><div><a href="/2021/04/15/how2heap学习笔记-2/" title="how2heap学习笔记-2"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-15</div><div class="title">how2heap学习笔记-2</div></div></a></div><div><a href="/2021/05/17/how2heap学习笔记-4/" title="how2heap学习笔记-4"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-17</div><div class="title">how2heap学习笔记-4</div></div></a></div><div><a href="/2021/05/19/how2heap学习笔记-5/" title="how2heap学习笔记-5"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-19</div><div class="title">how2heap学习笔记-5</div></div></a></div><div><a href="/2021/05/21/how2heap学习笔记-6/" title="how2heap学习笔记-6"><img class="cover" src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-05-21</div><div class="title">how2heap学习笔记-6</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">aYoung</div><div class="author-info__description">aYoung的博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">48</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/aYoung-CS"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/aYoung-CS" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">好好学习</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-of-Roman"><span class="toc-number">1.</span> <span class="toc-text">House of Roman</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#step-1"><span class="toc-number">2.</span> <span class="toc-text">step 1</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#step-2"><span class="toc-number">3.</span> <span class="toc-text">step 2</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#step-3"><span class="toc-number">4.</span> <span class="toc-text">step 3</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/" title="how2heap之House_of_Roman"><img src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="how2heap之House_of_Roman"/></a><div class="content"><a class="title" href="/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/" title="how2heap之House_of_Roman">how2heap之House_of_Roman</a><time datetime="2021-07-10T04:33:41.000Z" title="发表于 2021-07-10 12:33:41">2021-07-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/06/%E3%80%90WP%E3%80%91%E5%A8%B1%E4%B9%90%E8%B5%9Bawd%E7%9A%84%E4%B8%80%E9%81%93pwn%E9%A2%98/" title="【WP】娱乐赛awd的一道pwn题"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】娱乐赛awd的一道pwn题"/></a><div class="content"><a class="title" href="/2021/07/06/%E3%80%90WP%E3%80%91%E5%A8%B1%E4%B9%90%E8%B5%9Bawd%E7%9A%84%E4%B8%80%E9%81%93pwn%E9%A2%98/" title="【WP】娱乐赛awd的一道pwn题">【WP】娱乐赛awd的一道pwn题</a><time datetime="2021-07-06T14:22:05.000Z" title="发表于 2021-07-06 22:22:05">2021-07-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/04/%E3%80%90WP%E3%80%91%E5%BC%BA%E7%BD%91%E6%9D%AF%E4%B9%8Borw/" title="【WP】强网杯之orw"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】强网杯之orw"/></a><div class="content"><a class="title" href="/2021/07/04/%E3%80%90WP%E3%80%91%E5%BC%BA%E7%BD%91%E6%9D%AF%E4%B9%8Borw/" title="【WP】强网杯之orw">【WP】强网杯之orw</a><time datetime="2021-07-04T13:26:28.000Z" title="发表于 2021-07-04 21:26:28">2021-07-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/06/10/%E3%80%90WP%E3%80%91%E9%99%90%E5%88%B6%E4%B8%AA%E6%95%B0%E5%92%8C%E5%A4%A7%E5%B0%8F%E7%9A%84Null-Byte%E6%BA%A2%E5%87%BA/" title="【WP】限制个数和大小的Null-Byte溢出"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】限制个数和大小的Null-Byte溢出"/></a><div class="content"><a class="title" href="/2021/06/10/%E3%80%90WP%E3%80%91%E9%99%90%E5%88%B6%E4%B8%AA%E6%95%B0%E5%92%8C%E5%A4%A7%E5%B0%8F%E7%9A%84Null-Byte%E6%BA%A2%E5%87%BA/" title="【WP】限制个数和大小的Null-Byte溢出">【WP】限制个数和大小的Null-Byte溢出</a><time datetime="2021-06-10T11:29:11.000Z" title="发表于 2021-06-10 19:29:11">2021-06-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/06/08/%E3%80%90WP%E3%80%91%E8%93%9D%E5%B8%BD%E6%9D%AF2021%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn%E9%A2%98/" title="【WP】蓝帽杯2021半决赛pwn题"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】蓝帽杯2021半决赛pwn题"/></a><div class="content"><a class="title" href="/2021/06/08/%E3%80%90WP%E3%80%91%E8%93%9D%E5%B8%BD%E6%9D%AF2021%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn%E9%A2%98/" title="【WP】蓝帽杯2021半决赛pwn题">【WP】蓝帽杯2021半决赛pwn题</a><time datetime="2021-06-08T15:52:29.000Z" title="发表于 2021-06-08 23:52:29">2021-06-08</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By aYoung</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'L7cFgIQhurvmmSexryctex39-MdYXbMMI',
+      appKey: 'EG1BbRP3FTdnTfn0QeeeIDii',
+      placeholder: 'Please leave your footprints',
+      avatar: 'robohash',
+      meta: 'nick/mail/link'.split(','),
+      pageSize: '10',
+      avatar_cdn: 'https://www.gravatar.com/avatar/',
+      lang: 'zh-CN',
+      recordIP: true,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: true,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick/mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
