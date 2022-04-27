@@ -1,9 +1,9 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Python异常处理 | aYoung's Blog</title><meta name="keywords" content="python"><meta name="author" content="aYoung"><meta name="copyright" content="aYoung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="两个非常重要的功能python提供了来处理两个非常重要的功能python程序运行中出现的异常和错误  异常处理  断言 assertions    BaseException 所有异常的基类    SystemExit 解释器请求退出   KeyboardInterrupt 用户中断执行(通常是输入^C)   Exception 常规错误的基类   StopIteration 迭代器没有更多的值">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Python异常处理 | aYoung's Blog</title><meta name="keywords" content="python"><meta name="author" content="aYoung"><meta name="copyright" content="aYoung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="两个非常重要的功能python提供了来处理两个非常重要的功能python程序运行中出现的异常和错误  异常处理  断言 assertions |   BaseException   |   所有异常的基类   || —— | —— || SystemExit           |   解释器请求退出   ||KeyboardInterrupt    |    用户中断执行(通常是输入^C)||E">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python异常处理">
 <meta property="og:url" content="https://iamayoung.xyz/2021/02/19/python%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/index.html">
 <meta property="og:site_name" content="aYoung&#39;s Blog">
-<meta property="og:description" content="两个非常重要的功能python提供了来处理两个非常重要的功能python程序运行中出现的异常和错误  异常处理  断言 assertions    BaseException 所有异常的基类    SystemExit 解释器请求退出   KeyboardInterrupt 用户中断执行(通常是输入^C)   Exception 常规错误的基类   StopIteration 迭代器没有更多的值">
+<meta property="og:description" content="两个非常重要的功能python提供了来处理两个非常重要的功能python程序运行中出现的异常和错误  异常处理  断言 assertions |   BaseException   |   所有异常的基类   || —— | —— || SystemExit           |   解释器请求退出   ||KeyboardInterrupt    |    用户中断执行(通常是输入^C)||E">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://ftp.bmp.ovh/imgs/2021/01/70c83f7199199d10.png">
 <meta property="article:published_time" content="2021-02-19T14:45:52.000Z">
@@ -144,213 +144,20 @@
 <li><p>异常处理</p>
 </li>
 <li><p>断言 assertions</p>
-<table>
-<thead>
-<tr>
-<th>BaseException</th>
-<th>所有异常的基类</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>SystemExit</td>
-<td>解释器请求退出</td>
-</tr>
-<tr>
-<td>KeyboardInterrupt</td>
-<td>用户中断执行(通常是输入^C)</td>
-</tr>
-<tr>
-<td>Exception</td>
-<td>常规错误的基类</td>
-</tr>
-<tr>
-<td>StopIteration</td>
-<td>迭代器没有更多的值</td>
-</tr>
-<tr>
-<td>GeneratorExit</td>
-<td>生成器(generator)发生异常来通知退出</td>
-</tr>
-<tr>
-<td>StandardError</td>
-<td>所有的内建标准异常的基类</td>
-</tr>
-<tr>
-<td>ArithmeticError</td>
-<td>所有数值计算错误的基类</td>
-</tr>
-<tr>
-<td>FloatingPointError</td>
-<td>浮点计算错误</td>
-</tr>
-<tr>
-<td>OverflowError</td>
-<td>数值运算超出最大限制</td>
-</tr>
-<tr>
-<td>ZeroDivisionError</td>
-<td>除(或取模)零 (所有数据类型)</td>
-</tr>
-<tr>
-<td>AssertionError</td>
-<td>断言语句失败</td>
-</tr>
-<tr>
-<td>AttributeError</td>
-<td>对象没有这个属性</td>
-</tr>
-<tr>
-<td>EOFError</td>
-<td>没有内建输入,到达EOF 标记</td>
-</tr>
-<tr>
-<td>EnvironmentError</td>
-<td>操作系统错误的基类</td>
-</tr>
-<tr>
-<td>IOError</td>
-<td>输入/输出操作失败</td>
-</tr>
-<tr>
-<td>OSError</td>
-<td>操作系统错误</td>
-</tr>
-<tr>
-<td>WindowsError</td>
-<td>系统调用失败</td>
-</tr>
-<tr>
-<td>ImportError</td>
-<td>导入模块/对象失败</td>
-</tr>
-<tr>
-<td>LookupError</td>
-<td>无效数据查询的基类</td>
-</tr>
-<tr>
-<td>IndexError</td>
-<td>序列中没有此索引(index)</td>
-</tr>
-<tr>
-<td>KeyError</td>
-<td>映射中没有这个键</td>
-</tr>
-<tr>
-<td>MemoryError</td>
-<td>内存溢出错误(对于Python 解释器不是致命的)</td>
-</tr>
-<tr>
-<td>NameError</td>
-<td>未声明/初始化对象 (没有属性)</td>
-</tr>
-<tr>
-<td>UnboundLocalError</td>
-<td>访问未初始化的本地变量</td>
-</tr>
-<tr>
-<td>ReferenceError</td>
-<td>弱引用(Weak reference)试图访问已经垃圾回收了的对象</td>
-</tr>
-<tr>
-<td>RuntimeError</td>
-<td>一般的运行时错误</td>
-</tr>
-<tr>
-<td>NotImplementedError</td>
-<td>尚未实现的方法</td>
-</tr>
-<tr>
-<td>SyntaxError</td>
-<td>Python 语法错误</td>
-</tr>
-<tr>
-<td>IndentationError</td>
-<td>缩进错误</td>
-</tr>
-<tr>
-<td>TabError    Tab</td>
-<td>和空格混用</td>
-</tr>
-<tr>
-<td>SystemError</td>
-<td>一般的解释器系统错误</td>
-</tr>
-<tr>
-<td>TypeError</td>
-<td>对类型无效的操作</td>
-</tr>
-<tr>
-<td>ValueError</td>
-<td>传入无效的参数</td>
-</tr>
-<tr>
-<td>UnicodeError</td>
-<td>Unicode 相关的错误</td>
-</tr>
-<tr>
-<td>UnicodeDecodeError</td>
-<td>Unicode 解码时的错误</td>
-</tr>
-<tr>
-<td>UnicodeEncodeError</td>
-<td>Unicode 编码时错误</td>
-</tr>
-<tr>
-<td>UnicodeTranslateError</td>
-<td>Unicode 转换时错误</td>
-</tr>
-<tr>
-<td>Warning</td>
-<td>警告的基类</td>
-</tr>
-<tr>
-<td>DeprecationWarning</td>
-<td>关于被弃用的特征的警告</td>
-</tr>
-<tr>
-<td>FutureWarning</td>
-<td>关于构造将来语义会有改变的警告</td>
-</tr>
-<tr>
-<td>OverflowWarning</td>
-<td>旧的关于自动提升为长整型(long)的警告</td>
-</tr>
-<tr>
-<td>PendingDeprecationWarning</td>
-<td>关于特性将会被废弃的警告</td>
-</tr>
-<tr>
-<td>RuntimeWarning</td>
-<td>可疑的运行时行为(runtime behavior)的警告</td>
-</tr>
-<tr>
-<td>SyntaxWarning</td>
-<td>可疑的语法的警告</td>
-</tr>
-<tr>
-<td>UserWarning</td>
-<td>用户代码生成的警告</td>
-</tr>
-</tbody></table>
+<p>|   BaseException   |   所有异常的基类   |<br>| —— | —— |<br>| SystemExit           |   解释器请求退出   |<br>|KeyboardInterrupt    |    用户中断执行(通常是输入^C)|<br>|Exception        |    常规错误的基类|<br>|StopIteration        |    迭代器没有更多的值|<br>|GeneratorExit        |    生成器(generator)发生异常来通知退出|<br>|StandardError        |    所有的内建标准异常的基类|<br>|ArithmeticError    |    所有数值计算错误的基类|<br>|FloatingPointError    |    浮点计算错误|<br>|OverflowError        |    数值运算超出最大限制|<br>|ZeroDivisionError    |    除(或取模)零 (所有数据类型)|<br>|AssertionError        |断言语句失败|<br>|AttributeError        |    对象没有这个属性|<br>|EOFError        |        没有内建输入,到达EOF 标记|<br>|EnvironmentError    |    操作系统错误的基类|<br>|IOError            |    输入/输出操作失败|<br>|OSError            |    操作系统错误|<br>|WindowsError        |系统调用失败|<br>|ImportError    |        导入模块/对象失败|<br>|LookupError    |        无效数据查询的基类|<br>|IndexError        |    序列中没有此索引(index)|<br>|KeyError        |        映射中没有这个键|<br>|MemoryError    |        内存溢出错误(对于Python 解释器不是致命的)|<br>|NameError        |    未声明/初始化对象 (没有属性)|<br>|UnboundLocalError|    访问未初始化的本地变量|<br>|ReferenceError        |弱引用(Weak reference)试图访问已经垃圾回收了的对象|<br>|RuntimeError    |        一般的运行时错误|<br>|NotImplementedError|    尚未实现的方法|<br>|SyntaxError        |    Python 语法错误|<br>|IndentationError    |    缩进错误|<br>|TabError    Tab     |    和空格混用|<br>|SystemError        |    一般的解释器系统错误|<br>|TypeError            |对类型无效的操作|<br>|ValueError        |    传入无效的参数|<br>|UnicodeError    |Unicode 相关的错误|<br>|UnicodeDecodeError|    Unicode 解码时的错误|<br>|UnicodeEncodeError    |Unicode 编码时错误|<br>|UnicodeTranslateError    |Unicode 转换时错误|<br>|Warning    |警告的基类|<br>|DeprecationWarning    |关于被弃用的特征的警告|<br>|FutureWarning    |    关于构造将来语义会有改变的警告|<br>|OverflowWarning    |    旧的关于自动提升为长整型(long)的警告|<br>|PendingDeprecationWarning|    关于特性将会被废弃的警告|<br>|RuntimeWarning    |    可疑的运行时行为(runtime behavior)的警告|<br>|SyntaxWarning    |    可疑的语法的警告|<br>|UserWarning    |        用户代码生成的警告|</p>
 </li>
 </ol>
 <h1 id="什么是异常："><a href="#什么是异常：" class="headerlink" title="什么是异常："></a>什么是异常：</h1><p>异常一个事件，该事件会在程序执行过程中发生，影响了程序的正常执行<br>异常是python对象，表示一个错误<br>当python脚本发生异常时我们需要捕获处理它，否则程序会终止执行</p>
-<h1 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h1><h2 id="捕捉异常可以使用try-except语句"><a href="#捕捉异常可以使用try-except语句" class="headerlink" title="捕捉异常可以使用try/except语句"></a>捕捉异常可以使用try/except语句</h2><p>try/except语句用来检测try语句块中的错误，从而让except语句捕获异常信息并处理<br>如果不想在异常发生时结束程序，只需在try里捕获它<br>语法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">&lt;语句&gt;        <span class="comment">#运行别的代码</span></span><br><span class="line"><span class="keyword">except</span> &lt;名字&gt;：</span><br><span class="line">&lt;语句&gt;        <span class="comment">#如果在try部份引发了&#x27;name&#x27;异常</span></span><br><span class="line"><span class="keyword">except</span> &lt;名字&gt;，&lt;数据&gt;:</span><br><span class="line">&lt;语句&gt;        <span class="comment">#如果引发了&#x27;name&#x27;异常，获得附加的数据</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">&lt;语句&gt;        <span class="comment">#如果没有异常发生</span></span><br></pre></td></tr></table></figure>
-
+<h1 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h1><h2 id="捕捉异常可以使用try-except语句"><a href="#捕捉异常可以使用try-except语句" class="headerlink" title="捕捉异常可以使用try/except语句"></a>捕捉异常可以使用try/except语句</h2><p>try/except语句用来检测try语句块中的错误，从而让except语句捕获异常信息并处理<br>如果不想在异常发生时结束程序，只需在try里捕获它<br>语法：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">&lt;语句&gt;        <span class="comment">#运行别的代码</span></span><br><span class="line"><span class="keyword">except</span> &lt;名字&gt;：</span><br><span class="line">&lt;语句&gt;        <span class="comment">#如果在try部份引发了&#x27;name&#x27;异常</span></span><br><span class="line"><span class="keyword">except</span> &lt;名字&gt;，&lt;数据&gt;:</span><br><span class="line">&lt;语句&gt;        <span class="comment">#如果引发了&#x27;name&#x27;异常，获得附加的数据</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">&lt;语句&gt;        <span class="comment">#如果没有异常发生</span></span><br></pre></td></tr></table></figure></p>
 <p>try的工作原理是，当开始一个try语句后，python就在当前程序的上下文中作标记，这样当异常出现时就可以回到这里，try子句先执行，接下来会发生什么依赖于执行时是否出现异常</p>
 <ul>
 <li>当try后的语句执行时发生异常，python就跳回到try并执行第一个匹配该异常的except子句，异常处理完毕，控制流就通过整个try语句（除非在处理异常时又发生新的异常）</li>
 <li>当try后的语句发生了异常，却没有匹配的except子句，异常被递交到上层的try，或者到程序的最上层（这样就结束程序，并打印默认的出错信息）</li>
 <li>如果在try子句执行时没有发生异常，python将执行else语句后的语句（如果有else的话），然后控制流通过整个try语句</li>
 </ul>
-<p>可以不带任何异常类型使用except，如下实例：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    正常的操作</span><br><span class="line">   ......................</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">    发生异常，执行这块代码</span><br><span class="line">   ......................</span><br><span class="line"><span class="keyword">else</span>:</span><br></pre></td></tr></table></figure>
-
+<p>可以不带任何异常类型使用except，如下实例：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    正常的操作</span><br><span class="line">   ......................</span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">    发生异常，执行这块代码</span><br><span class="line">   ......................</span><br><span class="line"><span class="keyword">else</span>:</span><br></pre></td></tr></table></figure></p>
 <p>如果没有异常执行这块代码<br>【以上方式try-except语句捕获所有发生的异常。但这不是一个很好的方式，我们不能通过该程序识别出具体的异常信息。因为它捕获所有的异常。】</p>
-<h2 id="try-finally-语句"><a href="#try-finally-语句" class="headerlink" title="try-finally 语句"></a>try-finally 语句</h2><p>try-finally 语句无论是否发生异常都将执行最后的代码。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">&lt;语句&gt;</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">&lt;语句&gt;    <span class="comment">#退出try时总会执行</span></span><br></pre></td></tr></table></figure>
-<p>触发异常<br>我们可以使用raise语句自己触发异常<br>raise语法格式如下：<br><code>raise [Exception [, args [, traceback]]]</code></p>
+<h2 id="try-finally-语句"><a href="#try-finally-语句" class="headerlink" title="try-finally 语句"></a>try-finally 语句</h2><p>try-finally 语句无论是否发生异常都将执行最后的代码。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">&lt;语句&gt;</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">&lt;语句&gt;    <span class="comment">#退出try时总会执行</span></span><br></pre></td></tr></table></figure><br>触发异常<br>我们可以使用raise语句自己触发异常<br>raise语法格式如下：<br><code>raise [Exception [, args [, traceback]]]</code></p>
 <p>语句中 Exception 是异常的类型（例如，NameError）参数标准异常中任一种，args 是自已提供的异常参数。<br>最后一个参数是可选的（在实践中很少使用），如果存在，是跟踪异常对象。</p>
 </article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">aYoung</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://iamayoung.xyz/2021/02/19/python%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">https://iamayoung.xyz/2021/02/19/python%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://iamayoung.xyz" target="_blank">aYoung's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/python/">python</a></div><div class="post_share"><div class="social-share" data-image="https://ftp.bmp.ovh/imgs/2021/01/70c83f7199199d10.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/02/22/%E3%80%90WP%E3%80%91orw%E7%9A%84shellcode%E7%BC%96%E5%86%99/"><img class="prev-cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【WP】orw的shellcode编写</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/21/%E3%80%90WP%E3%80%91adworld%E4%B9%8Bpwn%E8%BF%9B%E9%98%B6%E5%8C%BAstack2/"><img class="next-cover" src="https://i.bmp.ovh/imgs/2021/01/c9d08fbaeb1fe8f9.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【WP】adworld之pwn进阶区stack2</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/01/08/python学习笔记/" title="Python学习笔记"><img class="cover" src="https://ftp.bmp.ovh/imgs/2021/01/70c83f7199199d10.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-08</div><div class="title">Python学习笔记</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://imgtu.com/i/731OZF" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">aYoung</div><div class="author-info__description">aYoung的博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">71</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/aYoung-CS"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/aYoung-CS" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">好好学习</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="toc-number">1.</span> <span class="toc-text">两个非常重要的功能</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%BC%82%E5%B8%B8%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">什么是异常：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8D%95%E6%8D%89%E5%BC%82%E5%B8%B8%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8try-except%E8%AF%AD%E5%8F%A5"><span class="toc-number">3.1.</span> <span class="toc-text">捕捉异常可以使用try&#x2F;except语句</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#try-finally-%E8%AF%AD%E5%8F%A5"><span class="toc-number">3.2.</span> <span class="toc-text">try-finally 语句</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/04/25/%E3%80%90WP%E3%80%91TSCTF2022-pwn%E9%83%A8%E5%88%86%E9%A2%98%E8%A7%A3/" title="【WP】TSCTF2022-Pwn部分题解"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】TSCTF2022-Pwn部分题解"/></a><div class="content"><a class="title" href="/2022/04/25/%E3%80%90WP%E3%80%91TSCTF2022-pwn%E9%83%A8%E5%88%86%E9%A2%98%E8%A7%A3/" title="【WP】TSCTF2022-Pwn部分题解">【WP】TSCTF2022-Pwn部分题解</a><time datetime="2022-04-25T13:49:56.000Z" title="发表于 2022-04-25 21:49:56">2022-04-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/04/18/%E3%80%90WP%E3%80%91XCTF-CTFpwn%E9%A2%98/" title="【WP】XCTF-*CTFpwn题"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】XCTF-*CTFpwn题"/></a><div class="content"><a class="title" href="/2022/04/18/%E3%80%90WP%E3%80%91XCTF-CTFpwn%E9%A2%98/" title="【WP】XCTF-*CTFpwn题">【WP】XCTF-*CTFpwn题</a><time datetime="2022-04-18T06:40:51.000Z" title="发表于 2022-04-18 14:40:51">2022-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/04/10/%E3%80%90WP%E3%80%912022%E8%BD%A6%E8%81%94%E7%BD%91/" title="【WP】2022车联网"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】2022车联网"/></a><div class="content"><a class="title" href="/2022/04/10/%E3%80%90WP%E3%80%912022%E8%BD%A6%E8%81%94%E7%BD%91/" title="【WP】2022车联网">【WP】2022车联网</a><time datetime="2022-04-10T11:24:49.000Z" title="发表于 2022-04-10 19:24:49">2022-04-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/04/07/%E3%80%90WP%E3%80%912022midnightctf-%E9%83%A8%E5%88%86pwn%E5%A4%8D%E7%8E%B0%E5%AD%A6%E4%B9%A0/" title="【WP】2022midnightctf_部分pwn复现学习"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】2022midnightctf_部分pwn复现学习"/></a><div class="content"><a class="title" href="/2022/04/07/%E3%80%90WP%E3%80%912022midnightctf-%E9%83%A8%E5%88%86pwn%E5%A4%8D%E7%8E%B0%E5%AD%A6%E4%B9%A0/" title="【WP】2022midnightctf_部分pwn复现学习">【WP】2022midnightctf_部分pwn复现学习</a><time datetime="2022-04-07T08:18:23.000Z" title="发表于 2022-04-07 16:18:23">2022-04-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/02/22/%E3%80%90WP%E3%80%91tqlctf2022-pwn/" title="【WP】tqlctf2022-Pwn"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】tqlctf2022-Pwn"/></a><div class="content"><a class="title" href="/2022/02/22/%E3%80%90WP%E3%80%91tqlctf2022-pwn/" title="【WP】tqlctf2022-Pwn">【WP】tqlctf2022-Pwn</a><time datetime="2022-02-22T12:14:22.000Z" title="发表于 2022-02-22 20:14:22">2022-02-22</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By aYoung</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
   window.MathJax = {
