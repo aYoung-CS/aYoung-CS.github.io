@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s1.ax1x.com/2022/08/09/v18HoT.png">
 <meta property="article:published_time" content="2022-08-09T11:14:43.000Z">
-<meta property="article:modified_time" content="2022-08-09T11:28:57.289Z">
+<meta property="article:modified_time" content="2022-08-09T11:39:47.380Z">
 <meta property="article:author" content="aYoung">
 <meta property="article:tag" content="ctf">
 <meta property="article:tag" content="pwn">
@@ -59,7 +59,7 @@
   isHome: false,
   isHighlightShrink: false,
   isToc: true,
-  postUpdate: '2022-08-09 19:28:57'
+  postUpdate: '2022-08-09 19:39:47'
 }</script><noscript><style type="text/css">
   #nav {
     opacity: 1
@@ -141,7 +141,7 @@
           document.documentElement.classList.remove('hide-aside')
         }
       }
-    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://imgtu.com/i/731OZF" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">76</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s1.ax1x.com/2022/08/09/v18HoT.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">aYoung's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">PowerPC_PWN从入门到实践</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-08-09T11:14:43.000Z" title="发表于 2022-08-09 19:14:43">2022-08-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-08-09T11:28:57.289Z" title="更新于 2022-08-09 19:28:57">2022-08-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ctf/">ctf</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">7.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>29分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://imgtu.com/i/731OZF" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">76</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s1.ax1x.com/2022/08/09/v18HoT.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">aYoung's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">PowerPC_PWN从入门到实践</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-08-09T11:14:43.000Z" title="发表于 2022-08-09 19:14:43">2022-08-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-08-09T11:39:47.380Z" title="更新于 2022-08-09 19:39:47">2022-08-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/ctf/">ctf</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">7.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>29分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
 <p>本文首发于跳跳糖，转载于个人博客<a target="_blank" rel="noopener" href="https://tttang.com/archive/1695/">PowerPC PWN从入门到实践</a></p>
 </blockquote>
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>前段时间2022虎符决赛结束，赛后从学长那看到了题目，其中出现了一道PowerPC64架构的pwn题，从架构方面来说比较少见，刚好之前看过一道PowerPC架构32位栈溢出的题目，于是放到一起整理一下。</p>
@@ -184,7 +184,55 @@
 <ul>
 <li>GPR寄存器</li>
 </ul>
-<p>General Purpose Rgister(GPR)，通用寄存器，从GPR0到GPR31共32个。<br>事实上在gdb中所见就是r0~r31，其中：<br>|  寄存器  |  用途  |<br>|  -  |  -  |<br>|  r0  |  发生系统调用时对应的系统调用号  |<br>|  r1  |  堆栈指针  |<br>|  r2  |  内容表（toc）指针，IDA把这个寄存器反汇编标识为rtoc。系统调用时，它包含系统调用号  |<br>|  r3  |  函数调用时的第一个参数和返回值  |<br>|  r4-r10  |  函数调用时参数传递  |<br>|  r11  |  用在指针的调用和当作一些语言的环境指针  |<br>|  r12  |   它用在异常处理和glink（动态连接器）代码  |<br>|  r13  |  保留作为系统线程ID  |<br>|  r14-r31  |  作为本地变量，非易失性  |</p>
+<p>General Purpose Rgister(GPR)，通用寄存器，从GPR0到GPR31共32个。<br>事实上在gdb中所见就是r0~r31，其中：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r0</td>
+<td>发生系统调用时对应的系统调用号</td>
+</tr>
+<tr>
+<td>r1</td>
+<td>堆栈指针</td>
+</tr>
+<tr>
+<td>r2</td>
+<td>内容表（toc）指针，IDA把这个寄存器反汇编标识为rtoc。系统调用时，它包含系统调用号</td>
+</tr>
+<tr>
+<td>r3</td>
+<td>函数调用时的第一个参数和返回值</td>
+</tr>
+<tr>
+<td>r4-r10</td>
+<td>函数调用时参数传递</td>
+</tr>
+<tr>
+<td>r11</td>
+<td>用在指针的调用和当作一些语言的环境指针</td>
+</tr>
+<tr>
+<td>r12</td>
+<td>它用在异常处理和glink（动态连接器）代码</td>
+</tr>
+<tr>
+<td>r13</td>
+<td>保留作为系统线程ID</td>
+</tr>
+<tr>
+<td>r14-r31</td>
+<td>作为本地变量，非易失性</td>
+</tr>
+</tbody>
+</table>
+</div>
 <ul>
 <li>FPR寄存器</li>
 </ul>
@@ -201,7 +249,35 @@
 <p>Condition Register(CR)，条件寄存器，它反映某些操作的结果，并提供一种测试（和转移）的机制</p>
 <p>条件寄存器中的位被分组为8个4位字段，命名为CR字段0(CR0)，…，CR字段7(CR7)。CR字段可以通过一些指令进行设置，其中CR0可以是整数指令的隐式结果，CR1可以时浮点指令的隐式结果，指定的CR字段可以表示整数或浮点数比较指令的结果。</p>
 <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/vZm4TU"><img src="https://s1.ax1x.com/2022/08/03/vZm4TU.png" alt="vZm4TU.png"></a></p>
-<p>CR0字段含义如下<br>|  Bits  |  描述  |<br>|  -  |  -  |<br>|  0  |  Negative(LT) - 结果为负时设置该位，即小于  |<br>|  1  |  Positive(GT) - 结果为正数（非零）时设置该位，即大于  |<br>|  2  |  Zero(EQ) - 结果为0时设置该位，即等于  |<br>|  3  |  Summary overflow(SO) - 这是XER[SO]指令完成时的最终状态的副本  |</p>
+<p>CR0字段含义如下</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Bits</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Negative(LT) - 结果为负时设置该位，即小于</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Positive(GT) - 结果为正数（非零）时设置该位，即大于</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Zero(EQ) - 结果为0时设置该位，即等于</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Summary overflow(SO) - 这是XER[SO]指令完成时的最终状态的副本</td>
+</tr>
+</tbody>
+</table>
+</div>
 <p>需要注意当溢出发生时，CR0可能不能反应真实的结果</p>
 <ul>
 <li>CTR寄存器</li>
