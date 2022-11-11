@@ -1,4 +1,4 @@
 # aYoung-CS.github.io
 aYoung's blog
 
-iamayoung.xyz
+blog.ayoung.vip
