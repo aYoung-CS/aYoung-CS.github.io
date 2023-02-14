@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Qemu搭建linux内核环境 | aYoung's Blog</title><meta name="keywords" content="linux"><meta name="author" content="aYoung"><meta name="copyright" content="aYoung"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="编译linux内核下载内核源码https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;kernel&#x2F;解压源码tar -xvf linux-xxxx.tar.gz 解压后进入源码根目录，指定编译架构，打开配置菜单 1234cd linux-xxxxexport ARCH&#x3D;x86make x86_64_defconfigmake menuconfig 编译生成镜像1sudo make">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qemu搭建linux内核环境">
+<meta property="og:url" content="https://iamayoung.xyz/2023/02/12/qemu%E6%90%AD%E5%BB%BAlinux%E5%86%85%E6%A0%B8%E7%8E%AF%E5%A2%83/index.html">
+<meta property="og:site_name" content="aYoung&#39;s Blog">
+<meta property="og:description" content="编译linux内核下载内核源码https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;kernel&#x2F;解压源码tar -xvf linux-xxxx.tar.gz 解压后进入源码根目录，指定编译架构，打开配置菜单 1234cd linux-xxxxexport ARCH&#x3D;x86make x86_64_defconfigmake menuconfig 编译生成镜像1sudo make">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s1.ax1x.com/2022/11/18/zn2XIe.png">
+<meta property="article:published_time" content="2023-02-12T11:24:50.000Z">
+<meta property="article:modified_time" content="2023-02-12T15:58:03.879Z">
+<meta property="article:author" content="aYoung">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s1.ax1x.com/2022/11/18/zn2XIe.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://iamayoung.xyz/2023/02/12/qemu%E6%90%AD%E5%BB%BAlinux%E5%86%85%E6%A0%B8%E7%8E%AF%E5%A2%83/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-02-12 23:58:03'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://s4.ax1x.com/2022/01/14/731OZF.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">83</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s1.ax1x.com/2022/11/18/zn2XIe.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">aYoung's Blog</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Qemu搭建linux内核环境</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-02-12T11:24:50.000Z" title="发表于 2023-02-12 19:24:50">2023-02-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-02-12T15:58:03.879Z" title="更新于 2023-02-12 23:58:03">2023-02-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/linux/">linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">695</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="编译linux内核"><a href="#编译linux内核" class="headerlink" title="编译linux内核"></a>编译linux内核</h1><p>下载内核源码<a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/kernel/">https://mirrors.tuna.tsinghua.edu.cn/kernel/</a><br>解压源码<code>tar -xvf linux-xxxx.tar.gz</code></p>
+<p>解压后进入源码根目录，指定编译架构，打开配置菜单</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd linux-xxxx</span><br><span class="line">export ARCH=x86</span><br><span class="line">make x86_64_defconfig</span><br><span class="line">make menuconfig</span><br></pre></td></tr></table></figure>
+<p>编译生成镜像<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo make -j 4 bzImage</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置busybox"><a href="#配置busybox" class="headerlink" title="配置busybox"></a>配置busybox</h1><p>启动内核还需要一个具有根文件系统的磁盘镜像文件，根文件系统中提供可供交互的shell程序以及一些常用工具命令。</p>
+<p>借助busybox工具来制作根文件系统</p>
+<p>下载地址 <a target="_blank" rel="noopener" href="https://git.busybox.net/busybox/">https://git.busybox.net/busybox/</a><br>解压<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -jxvf busybox-1.32.0.tar.bz2</span><br></pre></td></tr></table></figure></p>
+<p>进入busybox根目录，配置编译选项</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd busybox-1.32.0</span><br><span class="line">make menuconfig</span><br></pre></td></tr></table></figure>
+<p>设置为静态编译<br><figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Settings  ---&gt;</span><br><span class="line">            [*] Build BusyBox <span class="keyword">as</span> a <span class="keyword">static</span> binary (<span class="literal">no</span> shared libs) </span><br></pre></td></tr></table></figure></p>
+<h1 id="制作rootfs"><a href="#制作rootfs" class="headerlink" title="制作rootfs"></a>制作rootfs</h1><p>制作rootfs镜像文件，并把busybox安装到其中</p>
+<p>使用dd命令创建文件，并格式化为ext4文件系统</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ dd if=/dev/zero of=rootfs.img bs=1M count=100</span><br><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ mkfs.ext4 rootfs.img</span><br></pre></td></tr></table></figure>
+<p>创建用于挂载该镜像文件的目录fs，挂载后才能往里面写入busybox<br>使用mount命令将rootfs.img挂载到fs目录，编译busybox并写入fs目录中</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ mkdir fs</span><br><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ sudo mount -t ext4 -o loop rootfs.img ./fs</span><br><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ sudo make install CONFIG_PREFIX=./fs</span><br></pre></td></tr></table></figure>
+<p>接着对写入的busybox进行补充配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ cd fs</span><br><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0/fs$ sudo mkdir proc dev etc home mnt</span><br><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0/fs$ sudo cp -r ../examples/bootfloppy/etc/* etc/</span><br><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0/fs$ cd ..</span><br><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ sudo chmod -R 777 fs/</span><br></pre></td></tr></table></figure>
+<p>制作完成后rootfs目录如下<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ayoung@ubuntu:~/Desktop/busybox-1_32_0$ ls fs</span><br><span class="line">bin  dev  etc  home  linuxrc  lost+found  mnt  proc  sbin  usr</span><br></pre></td></tr></table></figure></p>
+<p>最后卸载rootfs.img<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo umount fs</span><br></pre></td></tr></table></figure></p>
+<h1 id="启动qemu"><a href="#启动qemu" class="headerlink" title="启动qemu"></a>启动qemu</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"></span><br><span class="line">qemu-system-x86_64 \</span><br><span class="line">        -kernel ./bzImage \</span><br><span class="line">        -hda ./rootfs.img \</span><br><span class="line">        -append &quot;root=/dev/sda console=ttyS0&quot; \</span><br><span class="line">        -nographic \</span><br><span class="line">        -s</span><br></pre></td></tr></table></figure>
+<p>此时会发现文件系统只读，无法执行mkdir等操作</p>
+<p>挂载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -o loop -w rootfs.img sysmain/</span><br></pre></td></tr></table></figure>
+<p>修改启动后执行的脚本<code>/etc/init.d/rcS</code>，可以在这里添加想要执行的命令。<code>mount rw -o remount /</code>将文件系统改为可读写。想要加入文件系统的文件可以直接放进挂载的目录下。完成后umount即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"></span><br><span class="line">mount rw -o remount /</span><br><span class="line">rm /tmp/sh</span><br><span class="line">setsid /bin/cttyhack setuidgid 1000 /bin/sh</span><br></pre></td></tr></table></figure>
+<h1 id="添加共享磁盘"><a href="#添加共享磁盘" class="headerlink" title="添加共享磁盘"></a>添加共享磁盘</h1><p>创建64MB磁盘镜像文件，并格式化为ext4，作为共享磁盘备用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dd if=/dev/zero of=ext4.img bs=512 count=131072</span><br><span class="line">mkfs.ext4 ext4.img</span><br></pre></td></tr></table></figure>
+<p>qemu启动命令中使用-hdb增加一个磁盘<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-hdb ext4.img</span><br></pre></td></tr></table></figure></p>
+<p>修改启动脚本，自动挂载sdb到mnt目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount -t ext4 /dev/sdb /mnt</span><br></pre></td></tr></table></figure>
+<p>宿主机挂载ext4.img，实现文件共享</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount -t ext4 -o loop ext4.img ./share</span><br></pre></td></tr></table></figure>
+<p>实测感觉没有很好用，感觉不如直接挂载原文件系统进行修改再卸载</p>
+<p>参考：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/STExqTiKpGXSp9E_DerV6g">https://mp.weixin.qq.com/s/STExqTiKpGXSp9E_DerV6g</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">aYoung</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://iamayoung.xyz/2023/02/12/qemu%E6%90%AD%E5%BB%BAlinux%E5%86%85%E6%A0%B8%E7%8E%AF%E5%A2%83/">https://iamayoung.xyz/2023/02/12/qemu%E6%90%AD%E5%BB%BAlinux%E5%86%85%E6%A0%B8%E7%8E%AF%E5%A2%83/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://iamayoung.xyz" target="_blank">aYoung's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/linux/">linux</a></div><div class="post_share"><div class="social-share" data-image="https://s1.ax1x.com/2022/11/18/zn2XIe.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/02/12/dirtypipe-CVE-2022-0847-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"><img class="prev-cover" src="https://s1.ax1x.com/2022/11/18/zn2XIe.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">dirtypipe(CVE-2022-0847)漏洞复现</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/03/%E3%80%90WP%E3%80%91geekgame%E5%AD%A6%E4%B9%A0/"><img class="next-cover" src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【WP】geekgame学习</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://s4.ax1x.com/2022/01/14/731OZF.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">aYoung</div><div class="author-info__description">aYoung的博客</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">83</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/aYoung-CS"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/aYoung-CS" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">好好学习</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%96%E8%AF%91linux%E5%86%85%E6%A0%B8"><span class="toc-number">1.</span> <span class="toc-text">编译linux内核</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%85%8D%E7%BD%AEbusybox"><span class="toc-number">2.</span> <span class="toc-text">配置busybox</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%B6%E4%BD%9Crootfs"><span class="toc-number">3.</span> <span class="toc-text">制作rootfs</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8qemu"><span class="toc-number">4.</span> <span class="toc-text">启动qemu</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E5%85%B1%E4%BA%AB%E7%A3%81%E7%9B%98"><span class="toc-number">5.</span> <span class="toc-text">添加共享磁盘</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/02/12/dirtypipe-CVE-2022-0847-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" title="dirtypipe(CVE-2022-0847)漏洞复现"><img src="https://s1.ax1x.com/2022/11/18/zn2XIe.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="dirtypipe(CVE-2022-0847)漏洞复现"/></a><div class="content"><a class="title" href="/2023/02/12/dirtypipe-CVE-2022-0847-%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" title="dirtypipe(CVE-2022-0847)漏洞复现">dirtypipe(CVE-2022-0847)漏洞复现</a><time datetime="2023-02-12T11:26:46.000Z" title="发表于 2023-02-12 19:26:46">2023-02-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/02/12/qemu%E6%90%AD%E5%BB%BAlinux%E5%86%85%E6%A0%B8%E7%8E%AF%E5%A2%83/" title="Qemu搭建linux内核环境"><img src="https://s1.ax1x.com/2022/11/18/zn2XIe.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Qemu搭建linux内核环境"/></a><div class="content"><a class="title" href="/2023/02/12/qemu%E6%90%AD%E5%BB%BAlinux%E5%86%85%E6%A0%B8%E7%8E%AF%E5%A2%83/" title="Qemu搭建linux内核环境">Qemu搭建linux内核环境</a><time datetime="2023-02-12T11:24:50.000Z" title="发表于 2023-02-12 19:24:50">2023-02-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/01/03/%E3%80%90WP%E3%80%91geekgame%E5%AD%A6%E4%B9%A0/" title="【WP】geekgame学习"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】geekgame学习"/></a><div class="content"><a class="title" href="/2023/01/03/%E3%80%90WP%E3%80%91geekgame%E5%AD%A6%E4%B9%A0/" title="【WP】geekgame学习">【WP】geekgame学习</a><time datetime="2023-01-03T15:17:24.000Z" title="发表于 2023-01-03 23:17:24">2023-01-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/21/%E3%80%90WP%E3%80%91%E8%93%9D%E5%B8%BD%E6%9D%AF2022-final/" title="【WP】蓝帽杯2022_final"><img src="https://ftp.bmp.ovh/imgs/2021/02/ec5ef65c96792f29.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】蓝帽杯2022_final"/></a><div class="content"><a class="title" href="/2022/09/21/%E3%80%90WP%E3%80%91%E8%93%9D%E5%B8%BD%E6%9D%AF2022-final/" title="【WP】蓝帽杯2022_final">【WP】蓝帽杯2022_final</a><time datetime="2022-09-21T12:27:44.000Z" title="发表于 2022-09-21 20:27:44">2022-09-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/07/%E3%80%90WP%E3%80%91Ethernaut/" title="【WP】Ethernaut"><img src="https://s1.ax1x.com/2022/11/18/zn2XIe.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【WP】Ethernaut"/></a><div class="content"><a class="title" href="/2022/09/07/%E3%80%90WP%E3%80%91Ethernaut/" title="【WP】Ethernaut">【WP】Ethernaut</a><time datetime="2022-09-07T06:46:53.000Z" title="发表于 2022-09-07 14:46:53">2022-09-07</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By aYoung</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    loader: {
+      source: {
+        '[tex]/amsCd': '[tex]/amscd'
+      }
+    },
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        addClass: [200,() => {
+          document.querySelectorAll('mjx-container:not([display=\'true\']').forEach( node => {
+            const target = node.parentNode
+            if (!target.classList.contains('has-jax')) {
+              target.classList.add('mathjax-overflow')
+            }
+          })
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'L7cFgIQhurvmmSexryctex39-MdYXbMMI',
+      appKey: 'EG1BbRP3FTdnTfn0QeeeIDii',
+      placeholder: 'Please leave your footprints',
+      avatar: 'robohash',
+      meta: 'nick/mail/link'.split(','),
+      pageSize: '10',
+      avatar_cdn: 'https://www.gravatar.com/avatar/',
+      lang: 'zh-CN',
+      recordIP: true,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: true,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick/mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
